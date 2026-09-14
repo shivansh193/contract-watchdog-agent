@@ -1,0 +1,5 @@
+{"timestamp": "2026-09-15T03:41:27", "contract_id": "CH-2024-118", "decision": "flagged_notified", "notes": "31.8% price increase, notice deadline approaching on Sept 20. Renegotiation email drafted and human notified."}
+{"timestamp": "2026-09-15T03:41:28", "contract_id": "LEASE-2023-07", "decision": "flagged_notified", "notes": "Notice deadline approaching on Sept 20, unfavorable clauses found (non-refundable security deposit on renewal, landlord entry without notice). Human notified."}
+{"timestamp": "2026-09-15T03:41:30", "contract_id": "NDA-2026-011", "decision": "reviewed_no_action", "notes": "Notice deadline is far out (renewal date October 2027, 0 notice days). No immediate action required."}
+{"timestamp": "2026-09-15T03:41:32", "contract_id": "NP-2025-002", "decision": "reviewed_no_action", "notes": "Renewal date April 2027 (notice deadline far out). Price unchanged ($89/mo). Skipped."}
+{"timestamp": "2026-09-15T03:41:34", "contract_id": "SC-2026-044", "decision": "reviewed_no_action", "notes": "Renewal date February 2027 (notice deadline far out). Price unchanged ($240/mo). Skipped."}

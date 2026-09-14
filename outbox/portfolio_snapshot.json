@@ -1,0 +1,176 @@
+{
+  "generatedAt": "2026-09-15T03:41:47",
+  "contracts": [
+    {
+      "id": "CH-2024-118",
+      "counterparty": "CloudHost Inc.",
+      "type": "vendor_saas",
+      "description": "production cloud hosting",
+      "status": "flagged",
+      "urgency": "high",
+      "hasPrice": true,
+      "prevPrice": 1100.0,
+      "currPrice": 1450.0,
+      "pctChange": 31.8,
+      "renewalDate": "2026-10-05",
+      "noticeDeadline": "2026-09-20",
+      "daysUntil": 5,
+      "risks": [
+        {
+          "phrase": "automatically renew",
+          "reason": "Auto-renews without active opt-in from the counterparty."
+        },
+        {
+          "phrase": "sole discretion",
+          "reason": "Other party can change terms unilaterally."
+        },
+        {
+          "phrase": "without notice",
+          "reason": "Other party may act (e.g. change price) without warning."
+        },
+        {
+          "phrase": "written notice",
+          "reason": "Cancellation requires formal written notice \u2014 easy to miss the window."
+        }
+      ],
+      "reasoning": "CloudHost Inc. has raised monthly hosting fees by 31.8% ($350/mo increase), and the contract auto-renews unless notice is given by September 20. A draft renegotiation email has been prepared.",
+      "recommendedAction": "Renegotiate or cancel before September 20, 2026 (15 days before the Oct 5 renewal) to avoid a 31.8% price increase ($1,100 to $1,450/mo).",
+      "hasEmail": true,
+      "emailSubject": "Renewal Terms for CH-2024-118 \u2014 Requesting a Call",
+      "emailBody": "Hi CloudHost Inc. team,\n\nOur production cloud hosting agreement (CH-2024-118) is coming up for renewal on 2026-10-05. We've noticed the price has moved from $1100/mo to $1450/mo. Before we renew, we'd like to discuss the terms. Could we get 15 minutes this week to talk through options?\n\n[Internal note, not for the counterparty \u2014 unverified estimate, confirm before using in the actual ask: Standard cloud infrastructure hosting of similar tier typically runs closer to a 10-15% variance year-over-year; a 31.8% jump is significantly above current market adjustments.]\n\nThanks,\nFounder",
+      "referencePricingNote": "Standard cloud infrastructure hosting of similar tier typically runs closer to a 10-15% variance year-over-year; a 31.8% jump is significantly above current market adjustments.",
+      "reviewedAt": "2026-09-15T03:41:27"
+    },
+    {
+      "id": "LEASE-2023-07",
+      "counterparty": "Meridian Properties LLC",
+      "type": "lease",
+      "description": "office space lease, Suite 400",
+      "status": "flagged",
+      "urgency": "high",
+      "hasPrice": false,
+      "prevPrice": 0.0,
+      "currPrice": 0.0,
+      "pctChange": 0.0,
+      "renewalDate": "2026-10-20",
+      "noticeDeadline": "2026-09-20",
+      "daysUntil": 5,
+      "risks": [
+        {
+          "phrase": "without notice",
+          "reason": "Other party may act (e.g. change price) without warning."
+        },
+        {
+          "phrase": "non-refundable",
+          "reason": "No refund path if you cancel after billing."
+        },
+        {
+          "phrase": "security deposit is non-refundable",
+          "reason": "Deposit forfeiture regardless of unit condition."
+        },
+        {
+          "phrase": "landlord may enter without",
+          "reason": "Landlord can enter with little/no notice."
+        },
+        {
+          "phrase": "early termination fee",
+          "reason": "Breaking the lease early carries a penalty \u2014 check the amount."
+        }
+      ],
+      "reasoning": "Meridian Properties lease for Suite 400 is approaching its September 20 notice deadline (30 days before Oct 20 renewal). It contains unfavorable risk clauses including security deposit non-refundability upon renewal and landlord entry without notice.",
+      "recommendedAction": "Review lease auto-renewal and notice deadline (September 20, 2026). Decide whether to renew or give 30 days notice to vacate/negotiate, noting unfavorable terms regarding non-refundable security deposit forfeiture upon renewal and landlord entry without notice.",
+      "hasEmail": false,
+      "emailSubject": null,
+      "emailBody": null,
+      "referencePricingNote": null,
+      "reviewedAt": "2026-09-15T03:41:28"
+    },
+    {
+      "id": "NDA-2026-011",
+      "counterparty": "Anthea Design Studio",
+      "type": "nda",
+      "description": "mutual NDA for contract design work",
+      "status": "reviewed",
+      "urgency": null,
+      "hasPrice": false,
+      "prevPrice": 0.0,
+      "currPrice": 0.0,
+      "pctChange": 0.0,
+      "renewalDate": "2027-10-20",
+      "noticeDeadline": "2027-10-20",
+      "daysUntil": 400,
+      "risks": [],
+      "reasoning": "Notice deadline is far out (renewal date October 2027, 0 notice days). No immediate action required.",
+      "recommendedAction": null,
+      "hasEmail": false,
+      "emailSubject": null,
+      "emailBody": null,
+      "referencePricingNote": null,
+      "reviewedAt": "2026-09-15T03:41:30"
+    },
+    {
+      "id": "NP-2025-002",
+      "counterparty": "Northwind Payroll",
+      "type": "vendor_saas",
+      "description": "payroll processing",
+      "status": "reviewed",
+      "urgency": null,
+      "hasPrice": true,
+      "prevPrice": 89.0,
+      "currPrice": 89.0,
+      "pctChange": 0.0,
+      "renewalDate": "2027-04-13",
+      "noticeDeadline": "2027-03-14",
+      "daysUntil": 180,
+      "risks": [
+        {
+          "phrase": "written notice",
+          "reason": "Cancellation requires formal written notice \u2014 easy to miss the window."
+        }
+      ],
+      "reasoning": "Renewal date April 2027 (notice deadline far out). Price unchanged ($89/mo). Skipped.",
+      "recommendedAction": null,
+      "hasEmail": false,
+      "emailSubject": null,
+      "emailBody": null,
+      "referencePricingNote": null,
+      "reviewedAt": "2026-09-15T03:41:32"
+    },
+    {
+      "id": "SC-2026-044",
+      "counterparty": "SignalCRM",
+      "type": "vendor_saas",
+      "description": "CRM platform",
+      "status": "reviewed",
+      "urgency": null,
+      "hasPrice": true,
+      "prevPrice": 240.0,
+      "currPrice": 240.0,
+      "pctChange": 0.0,
+      "renewalDate": "2027-02-12",
+      "noticeDeadline": "2026-12-14",
+      "daysUntil": 90,
+      "risks": [
+        {
+          "phrase": "automatically renew",
+          "reason": "Auto-renews without active opt-in from the counterparty."
+        },
+        {
+          "phrase": "unilaterally",
+          "reason": "Other party can change terms unilaterally."
+        },
+        {
+          "phrase": "non-refundable",
+          "reason": "No refund path if you cancel after billing."
+        }
+      ],
+      "reasoning": "Renewal date February 2027 (notice deadline far out). Price unchanged ($240/mo). Skipped.",
+      "recommendedAction": null,
+      "hasEmail": false,
+      "emailSubject": null,
+      "emailBody": null,
+      "referencePricingNote": null,
+      "reviewedAt": "2026-09-15T03:41:34"
+    }
+  ]
+}
