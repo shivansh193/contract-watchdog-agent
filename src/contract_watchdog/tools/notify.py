@@ -49,7 +49,7 @@ def notify_human(
     entry = {
         "timestamp": datetime.now().isoformat(timespec="seconds"),
         "contract_id": contract_id,
-        "vendor": vendor,
+        "counterparty": counterparty,
         "summary": summary,
         "recommended_action": recommended_action,
         "urgency": urgency,

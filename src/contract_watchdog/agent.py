@@ -57,7 +57,7 @@ def _get_model():
         from strands.models import GeminiModel
 
         return GeminiModel(
-            model_id=os.getenv("GEMINI_MODEL_ID", "gemini-2.5-flash"),
+            model_id=os.getenv("GEMINI_MODEL_ID", "gemini-3.6-flash"),
             client_args={"api_key": os.environ["GEMINI_API_KEY"]},
         )
 

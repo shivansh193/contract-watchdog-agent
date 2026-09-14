@@ -1,0 +1,17 @@
+[build-system]
+requires = ["setuptools>=68"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "contract-watchdog-agent"
+version = "0.1.0"
+description = "Autonomous contract-obligation watchdog agent built on the Strands Agents SDK"
+requires-python = ">=3.10"
+dependencies = [
+    "strands-agents>=1.55.0",
+    "python-dotenv>=1.0.0",
+    "google-genai>=0.3.0",
+]
+
+[tool.setuptools.packages.find]
+where = ["src"]
