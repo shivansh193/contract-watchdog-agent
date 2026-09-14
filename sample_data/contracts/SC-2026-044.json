@@ -1,7 +1,8 @@
 {
-  "vendor": "SignalCRM",
+  "contract_type": "vendor_saas",
+  "counterparty": "SignalCRM",
   "contract_id": "SC-2026-044",
-  "service": "CRM platform",
+  "description": "CRM platform",
   "current_price_monthly_usd": 240,
   "previous_price_monthly_usd": 240,
   "renewal_date": "2027-02-11",

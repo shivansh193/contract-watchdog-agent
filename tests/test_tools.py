@@ -1,7 +1,8 @@
 """Unit tests for the watchdog tools — no model/API key needed.
 
-These exercise the tools' plain Python logic directly (calling the
-underlying function via .func, since @tool wraps them for agent use).
+@tool-wrapped functions stay directly callable with their original
+signature, so these call them the same way the agent's own reasoning
+would, just without a model in the loop.
 """
 
 import sys
@@ -32,7 +33,7 @@ def test_scan_for_renewals_flags_close_deadline():
         },
     ]
 
-    due = scan_for_renewals.func(contracts, within_days=45)
+    due = scan_for_renewals(contracts, within_days=45)
 
     assert [c["contract_id"] for c in due] == ["A"]
     assert due[0]["days_until_notice_deadline"] == 5
@@ -41,12 +42,12 @@ def test_scan_for_renewals_flags_close_deadline():
 def test_detect_price_changes_flags_increase_past_threshold():
     contract = {
         "contract_id": "A",
-        "vendor": "CloudHost",
+        "counterparty": "CloudHost",
         "current_price_monthly_usd": 1450,
         "previous_price_monthly_usd": 1100,
     }
 
-    result = detect_price_changes.func(contract, threshold_pct=8.0)
+    result = detect_price_changes(contract, threshold_pct=8.0)
 
     assert result["flagged"] is True
     assert result["pct_change"] > 8.0
@@ -59,7 +60,7 @@ def test_detect_price_changes_ignores_small_increase():
         "previous_price_monthly_usd": 89,
     }
 
-    result = detect_price_changes.func(contract, threshold_pct=8.0)
+    result = detect_price_changes(contract, threshold_pct=8.0)
 
     assert result["flagged"] is False
 
@@ -73,7 +74,7 @@ def test_detect_unfavorable_clauses_finds_known_risk_language():
         ),
     }
 
-    result = detect_unfavorable_clauses.func(contract)
+    result = detect_unfavorable_clauses(contract)
 
     phrases = {m["phrase"] for m in result["risk_matches"]}
     assert "automatically renew" in phrases
@@ -87,6 +88,23 @@ def test_detect_unfavorable_clauses_clean_contract_has_no_matches():
         "contract_excerpt": "This Agreement renews annually at a fixed price.",
     }
 
-    result = detect_unfavorable_clauses.func(contract)
+    result = detect_unfavorable_clauses(contract)
 
     assert result["risk_count"] == 0
+
+
+def test_detect_unfavorable_clauses_applies_type_specific_phrases():
+    lease = {
+        "contract_id": "L1",
+        "contract_type": "lease",
+        "contract_excerpt": (
+            "Tenant's security deposit is non-refundable. Landlord may enter "
+            "without notice."
+        ),
+    }
+
+    result = detect_unfavorable_clauses(lease)
+
+    phrases = {m["phrase"] for m in result["risk_matches"]}
+    assert "security deposit is non-refundable" in phrases
+    assert "landlord may enter without" in phrases

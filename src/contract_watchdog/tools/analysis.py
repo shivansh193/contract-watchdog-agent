@@ -76,7 +76,7 @@ def detect_price_changes(contract: dict, threshold_pct: float = 8.0) -> dict:
 
     return {
         "contract_id": contract.get("contract_id"),
-        "vendor": contract.get("vendor"),
+        "counterparty": contract.get("counterparty"),
         "previous_price_monthly_usd": previous,
         "current_price_monthly_usd": current,
         "pct_change": round(pct_change, 1),
@@ -86,25 +86,30 @@ def detect_price_changes(contract: dict, threshold_pct: float = 8.0) -> dict:
 
 @tool
 def detect_unfavorable_clauses(contract: dict) -> dict:
-    """Scan a contract's text excerpt for known renewal-trap and risk language.
+    """Scan a contract's text excerpt for known risk language, tuned to its contract_type.
 
     Args:
-        contract: A single contract record with a contract_excerpt field.
+        contract: A single contract record with a contract_excerpt field and
+            (optionally) a contract_type — "vendor_saas", "lease",
+            "employment", or "nda". Unrecognized/missing types fall back to
+            the general risk-phrase set only.
 
     Returns:
         A dict with contract_id and a list of {phrase, reason} matches found
         in the excerpt.
     """
     excerpt = contract.get("contract_excerpt", "").lower()
+    phrases = _risk_phrases_for(contract.get("contract_type", ""))
     matches = [
         {"phrase": phrase, "reason": reason}
-        for phrase, reason in RISK_PHRASES.items()
+        for phrase, reason in phrases.items()
         if phrase in excerpt
     ]
 
     return {
         "contract_id": contract.get("contract_id"),
-        "vendor": contract.get("vendor"),
+        "counterparty": contract.get("counterparty"),
+        "contract_type": contract.get("contract_type", "general"),
         "risk_matches": matches,
         "risk_count": len(matches),
     }

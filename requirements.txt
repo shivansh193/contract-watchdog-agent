@@ -1,7 +1,10 @@
 strands-agents>=1.55.0
 python-dotenv>=1.0.0
+google-genai>=0.3.0          # MODEL_PROVIDER=gemini (default)
 
-# Uncomment the line for whichever model provider you use (see .env.example):
-# google-genai>=0.3.0        # MODEL_PROVIDER=gemini (default)
+# Uncomment if you switch MODEL_PROVIDER (see .env.example):
 # boto3>=1.34.0              # MODEL_PROVIDER=bedrock
 # ollama>=0.3.0               # MODEL_PROVIDER=ollama
+
+# Dev/test only:
+# pytest>=8.0.0

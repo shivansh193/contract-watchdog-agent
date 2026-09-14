@@ -23,7 +23,7 @@ OUTBOX_PATH = os.path.join("outbox", "pending_decisions.jsonl")
 @tool
 def notify_human(
     contract_id: str,
-    vendor: str,
+    counterparty: str,
     summary: str,
     recommended_action: str,
     urgency: str = "normal",
@@ -32,7 +32,7 @@ def notify_human(
 
     Args:
         contract_id: The contract this notification is about.
-        vendor: The vendor name, for a scannable notification.
+        counterparty: The other party's name (vendor, landlord, employer, ...), for a scannable notification.
         summary: A short (1-3 sentence) explanation of what was found and why
             it matters — assume the human hasn't read the contract recently.
         recommended_action: What the agent recommends doing (e.g. "cancel

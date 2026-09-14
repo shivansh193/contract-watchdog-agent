@@ -1,0 +1,13 @@
+{
+  "contract_type": "lease",
+  "counterparty": "Meridian Properties LLC",
+  "contract_id": "LEASE-2023-07",
+  "description": "office space lease, Suite 400",
+  "current_price_monthly_usd": 0,
+  "previous_price_monthly_usd": 0,
+  "renewal_date": "2026-10-19",
+  "auto_renew": true,
+  "notice_period_days": 30,
+  "contract_excerpt": "Lease renews automatically for a one-year term. Tenant's security deposit is non-refundable upon renewal. Landlord may enter without notice for inspection purposes. Early termination fee equal to two months' rent applies.",
+  "owner_email": "founder@example.com"
+}

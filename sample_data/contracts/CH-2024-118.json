@@ -1,7 +1,8 @@
 {
-  "vendor": "CloudHost Inc.",
+  "contract_type": "vendor_saas",
+  "counterparty": "CloudHost Inc.",
   "contract_id": "CH-2024-118",
-  "service": "Production cloud hosting",
+  "description": "production cloud hosting",
   "current_price_monthly_usd": 1450,
   "previous_price_monthly_usd": 1100,
   "renewal_date": "2026-10-04",

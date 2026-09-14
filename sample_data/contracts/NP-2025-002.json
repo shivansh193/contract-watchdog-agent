@@ -1,7 +1,8 @@
 {
-  "vendor": "Northwind Payroll",
+  "contract_type": "vendor_saas",
+  "counterparty": "Northwind Payroll",
   "contract_id": "NP-2025-002",
-  "service": "Payroll processing",
+  "description": "payroll processing",
   "current_price_monthly_usd": 89,
   "previous_price_monthly_usd": 89,
   "renewal_date": "2027-04-12",

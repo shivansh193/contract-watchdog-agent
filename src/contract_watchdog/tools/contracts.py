@@ -1,4 +1,10 @@
-"""Tools for loading contract records and finding which ones are approaching renewal."""
+"""Tools for loading contract records and finding which ones are approaching renewal.
+
+Works across contract types — vendor/SaaS agreements, leases, employment
+contracts, NDAs, service agreements — as long as a record has a
+renewal_date and notice_period_days. Type-specific risk analysis lives in
+analysis.py, keyed off each record's contract_type.
+"""
 
 import json
 import os
@@ -9,12 +15,14 @@ from strands import tool
 
 @tool
 def load_contracts(directory: str = "sample_data/contracts") -> list[dict]:
-    """Load all vendor contract records from a directory of JSON files.
+    """Load all contract records from a directory of JSON files.
 
     Args:
         directory: Path to a folder containing one JSON file per contract.
-            Each file is expected to have: vendor, contract_id, service,
-            current_price_monthly_usd, previous_price_monthly_usd,
+            Each file is expected to have: contract_type (e.g. "vendor_saas",
+            "lease", "employment", "nda"), counterparty, contract_id,
+            description, current_price_monthly_usd, previous_price_monthly_usd
+            (omit/zero for contracts with no recurring price, e.g. an NDA),
             renewal_date (YYYY-MM-DD), auto_renew, notice_period_days,
             contract_excerpt, owner_email.
 
@@ -42,7 +50,8 @@ def scan_for_renewals(contracts: list[dict], within_days: int = 45) -> list[dict
     """Find contracts whose cancel/renegotiate notice deadline falls within a lookahead window.
 
     A contract's "notice deadline" is its renewal_date minus notice_period_days —
-    the last day a human could act before the contract silently auto-renews.
+    the last day a human could act before the contract silently auto-renews
+    or a term-based obligation (e.g. an NDA's confidentiality window) locks in.
 
     Args:
         contracts: Contract records, as returned by load_contracts.

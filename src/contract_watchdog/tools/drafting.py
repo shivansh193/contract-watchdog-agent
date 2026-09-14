@@ -1,13 +1,21 @@
-"""Tool for turning a decision into a ready-to-send email draft."""
+"""Tool for turning a decision into a ready-to-send email draft.
+
+Covers the two actions that make sense across contract types: canceling
+before an auto-renewal locks in, or opening a renegotiation conversation
+(price, terms, or a flagged clause). For contract types where "send an
+email" isn't the right next step (e.g. an NDA nearing the end of its
+confidentiality term), the agent is expected to use notify_human directly
+with its recommendation instead of calling this tool.
+"""
 
 from strands import tool
 
 _TEMPLATES = {
     "cancel": (
         "Subject: Notice of Non-Renewal — {contract_id}\n\n"
-        "Hi {vendor} team,\n\n"
+        "Hi {counterparty} team,\n\n"
         "Please treat this as formal written notice that we will not be renewing "
-        "{service} (contract {contract_id}), effective at the end of the current term "
+        "{description} (contract {contract_id}), effective at the end of the current term "
         "({renewal_date}). Per the notice terms in our agreement, we understand this "
         "notice satisfies the {notice_period_days}-day requirement.\n\n"
         "Please confirm receipt and the effective cancellation date.\n\n"
@@ -15,12 +23,10 @@ _TEMPLATES = {
     ),
     "renegotiate": (
         "Subject: Renewal Terms for {contract_id} — Requesting a Call\n\n"
-        "Hi {vendor} team,\n\n"
-        "Our {service} contract ({contract_id}) is coming up for renewal on "
-        "{renewal_date}. We've noticed the price has moved from "
-        "${previous_price_monthly_usd:.0f}/mo to ${current_price_monthly_usd:.0f}/mo, "
-        "and before we renew we'd like to discuss the new terms. Could we get 15 "
-        "minutes this week to talk through options?\n\n"
+        "Hi {counterparty} team,\n\n"
+        "Our {description} agreement ({contract_id}) is coming up for renewal on "
+        "{renewal_date}.{price_line} Before we renew, we'd like to discuss the terms. "
+        "Could we get 15 minutes this week to talk through options?\n\n"
         "Thanks,\n{owner_name}"
     ),
 }
@@ -46,14 +52,22 @@ def draft_email(contract: dict, decision: str, reasoning: str) -> dict:
     owner_email = contract.get("owner_email", "")
     owner_name = owner_email.split("@")[0].replace(".", " ").title() or "Team"
 
+    previous_price = float(contract.get("previous_price_monthly_usd", 0))
+    current_price = float(contract.get("current_price_monthly_usd", 0))
+    price_line = ""
+    if current_price and previous_price and current_price != previous_price:
+        price_line = (
+            f" We've noticed the price has moved from ${previous_price:.0f}/mo "
+            f"to ${current_price:.0f}/mo."
+        )
+
     fields = {
         "contract_id": contract.get("contract_id", ""),
-        "vendor": contract.get("vendor", ""),
-        "service": contract.get("service", ""),
+        "counterparty": contract.get("counterparty", ""),
+        "description": contract.get("description", "this agreement"),
         "renewal_date": contract.get("renewal_date", ""),
         "notice_period_days": contract.get("notice_period_days", 0),
-        "previous_price_monthly_usd": float(contract.get("previous_price_monthly_usd", 0)),
-        "current_price_monthly_usd": float(contract.get("current_price_monthly_usd", 0)),
+        "price_line": price_line,
         "owner_name": owner_name,
     }
 
