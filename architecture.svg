@@ -1,0 +1,112 @@
+<svg viewBox="0 0 1150 980" xmlns="http://www.w3.org/2000/svg" font-family="Helvetica, Arial, sans-serif">
+  <defs>
+    <marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path d="M0,0 L10,5 L0,10 z" fill="#4a4940"/>
+    </marker>
+    <marker id="arrowMuted" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path d="M0,0 L10,5 L0,10 z" fill="#a3a196"/>
+    </marker>
+  </defs>
+
+  <rect x="0" y="0" width="1150" height="980" fill="#ffffff"/>
+
+  <!-- ===== Row 1: inputs ===== -->
+  <rect x="90" y="25" width="260" height="50" rx="6" fill="#f7f5f0" stroke="#d8d3c5"/>
+  <text x="220" y="55" text-anchor="middle" font-size="13" fill="#262420">sample_data/contracts/*.json</text>
+
+  <rect x="800" y="25" width="270" height="55" rx="6" fill="#ffffff" stroke="#c9c4b4" stroke-dasharray="5 4"/>
+  <text x="935" y="47" text-anchor="middle" font-size="12" fill="#8a887c">mail_ingest.py (Gmail / Outlook / IMAP)</text>
+  <text x="935" y="64" text-anchor="middle" font-size="11" fill="#a3a196">future path, not wired for this submission</text>
+
+  <!-- ===== load_contracts ===== -->
+  <rect x="470" y="130" width="220" height="50" rx="6" fill="#f7f5f0" stroke="#d8d3c5"/>
+  <text x="580" y="160" text-anchor="middle" font-size="13" font-weight="600" fill="#262420">load_contracts</text>
+
+  <line x1="220" y1="75" x2="530" y2="130" stroke="#4a4940" stroke-width="1.5" marker-end="url(#arrow)"/>
+  <line x1="900" y1="80" x2="640" y2="130" stroke="#a3a196" stroke-width="1.5" stroke-dasharray="5 4" marker-end="url(#arrowMuted)"/>
+
+  <!-- ===== scan_for_renewals ===== -->
+  <rect x="430" y="220" width="300" height="52" rx="6" fill="#f7f5f0" stroke="#d8d3c5"/>
+  <text x="580" y="242" text-anchor="middle" font-size="13" font-weight="600" fill="#262420">scan_for_renewals</text>
+  <text x="580" y="259" text-anchor="middle" font-size="11" fill="#8a887c">finds contracts within notice window</text>
+  <line x1="580" y1="180" x2="580" y2="220" stroke="#4a4940" stroke-width="1.5" marker-end="url(#arrow)"/>
+
+  <!-- ===== check_recent_decisions (side input) ===== -->
+  <rect x="50" y="320" width="250" height="62" rx="6" fill="#f7f5f0" stroke="#d8d3c5"/>
+  <text x="175" y="345" text-anchor="middle" font-size="13" font-weight="600" fill="#262420">check_recent_decisions</text>
+  <text x="175" y="362" text-anchor="middle" font-size="11" fill="#8a887c">reads decision_log.jsonl first</text>
+
+  <!-- ===== Agent Reasoning (central) ===== -->
+  <rect x="395" y="312" width="370" height="78" rx="10" fill="#fbf0e2" stroke="#d8a860" stroke-width="1.5"/>
+  <text x="580" y="345" text-anchor="middle" font-size="15" font-weight="700" fill="#1a1815">Agent Reasoning</text>
+  <text x="580" y="365" text-anchor="middle" font-size="12" fill="#6b5a3a">Strands Agents SDK</text>
+
+  <line x1="580" y1="272" x2="580" y2="312" stroke="#4a4940" stroke-width="1.5" marker-end="url(#arrow)"/>
+  <line x1="300" y1="351" x2="395" y2="351" stroke="#4a4940" stroke-width="1.5" marker-end="url(#arrow)"/>
+
+  <!-- ===== Row of 3 tools ===== -->
+  <rect x="130" y="440" width="230" height="55" rx="6" fill="#f7f5f0" stroke="#d8d3c5"/>
+  <text x="245" y="472" text-anchor="middle" font-size="12.5" font-weight="600" fill="#262420">detect_price_changes</text>
+
+  <rect x="440" y="440" width="280" height="55" rx="6" fill="#f7f5f0" stroke="#d8d3c5"/>
+  <text x="580" y="464" text-anchor="middle" font-size="12.5" font-weight="600" fill="#262420">detect_unfavorable_clauses</text>
+  <text x="580" y="480" text-anchor="middle" font-size="10.5" fill="#8a887c">type-aware: vendor_saas / lease / employment / nda</text>
+
+  <rect x="800" y="440" width="270" height="55" rx="6" fill="#f7f5f0" stroke="#d8d3c5"/>
+  <text x="935" y="464" text-anchor="middle" font-size="12.5" font-weight="600" fill="#262420">draft_email</text>
+  <text x="935" y="480" text-anchor="middle" font-size="10.5" fill="#8a887c">+ optional reference_pricing_note</text>
+
+  <line x1="290" y1="440" x2="470" y2="390" stroke="#4a4940" stroke-width="1.3" marker-start="url(#arrow)" marker-end="url(#arrow)"/>
+  <line x1="580" y1="440" x2="580" y2="390" stroke="#4a4940" stroke-width="1.3" marker-start="url(#arrow)" marker-end="url(#arrow)"/>
+  <line x1="880" y1="440" x2="700" y2="390" stroke="#4a4940" stroke-width="1.3" marker-start="url(#arrow)" marker-end="url(#arrow)"/>
+
+  <!-- ===== Fork: skip vs notify_human ===== -->
+  <line x1="470" y1="400" x2="300" y2="608" stroke="#a3a196" stroke-width="1.5" stroke-dasharray="5 4" marker-end="url(#arrowMuted)"/>
+  <text x="345" y="500" text-anchor="middle" font-size="11" fill="#8a887c">routine,</text>
+  <text x="345" y="514" text-anchor="middle" font-size="11" fill="#8a887c">no action needed</text>
+
+  <line x1="690" y1="400" x2="850" y2="608" stroke="#4a4940" stroke-width="1.5" marker-end="url(#arrow)"/>
+  <text x="830" y="500" text-anchor="middle" font-size="11" fill="#6b5a3a">needs a</text>
+  <text x="830" y="514" text-anchor="middle" font-size="11" fill="#6b5a3a">human decision</text>
+
+  <rect x="180" y="610" width="240" height="52" rx="6" fill="#ffffff" stroke="#c9c4b4" stroke-dasharray="5 4"/>
+  <text x="300" y="632" text-anchor="middle" font-size="12" fill="#8a887c">quietly skip</text>
+  <text x="300" y="648" text-anchor="middle" font-size="10.5" fill="#a3a196">no tool call</text>
+
+  <rect x="720" y="605" width="300" height="62" rx="8" fill="#fbe1d1" stroke="#c9791f" stroke-width="1.5"/>
+  <text x="870" y="630" text-anchor="middle" font-size="13" font-weight="700" fill="#1a1815">notify_human</text>
+  <text x="870" y="648" text-anchor="middle" font-size="10.5" fill="#8a4a12">guard: is_recently_flagged()</text>
+
+  <!-- ===== notify_human outputs ===== -->
+  <line x1="800" y1="667" x2="700" y2="740" stroke="#a3a196" stroke-width="1.5" stroke-dasharray="5 4" marker-end="url(#arrowMuted)"/>
+  <text x="690" y="705" text-anchor="middle" font-size="10.5" fill="#8a887c">duplicate</text>
+  <text x="690" y="718" text-anchor="middle" font-size="10.5" fill="#8a887c">(within cooldown)</text>
+
+  <rect x="580" y="742" width="240" height="52" rx="6" fill="#ffffff" stroke="#c9c4b4" stroke-dasharray="5 4"/>
+  <text x="700" y="763" text-anchor="middle" font-size="12" fill="#8a887c">no-op</text>
+  <text x="700" y="779" text-anchor="middle" font-size="10.5" fill="#a3a196">not re-written, blocked in code</text>
+
+  <line x1="930" y1="667" x2="990" y2="740" stroke="#4a4940" stroke-width="1.5" marker-end="url(#arrow)"/>
+  <text x="1000" y="705" text-anchor="middle" font-size="10.5" fill="#6b5a3a">new</text>
+
+  <rect x="870" y="742" width="260" height="60" rx="6" fill="#f7f5f0" stroke="#d8d3c5"/>
+  <text x="1000" y="766" text-anchor="middle" font-size="12" font-weight="600" fill="#262420">outbox/</text>
+  <text x="1000" y="783" text-anchor="middle" font-size="12" font-weight="600" fill="#262420">pending_decisions.jsonl</text>
+
+  <!-- ===== record_decision ===== -->
+  <rect x="465" y="835" width="230" height="52" rx="6" fill="#f7f5f0" stroke="#d8d3c5"/>
+  <text x="580" y="866" text-anchor="middle" font-size="13" font-weight="600" fill="#262420">record_decision</text>
+
+  <line x1="300" y1="662" x2="500" y2="835" stroke="#4a4940" stroke-width="1.5" marker-end="url(#arrow)"/>
+  <line x1="870" y1="667" x2="640" y2="835" stroke="#4a4940" stroke-width="1.5" marker-end="url(#arrow)"/>
+
+  <!-- ===== decision_log.jsonl ===== -->
+  <rect x="450" y="915" width="260" height="55" rx="6" fill="#f7f5f0" stroke="#d8d3c5"/>
+  <text x="580" y="938" text-anchor="middle" font-size="12" font-weight="600" fill="#262420">outbox/</text>
+  <text x="580" y="955" text-anchor="middle" font-size="12" font-weight="600" fill="#262420">decision_log.jsonl</text>
+  <line x1="580" y1="887" x2="580" y2="915" stroke="#4a4940" stroke-width="1.5" marker-end="url(#arrow)"/>
+
+  <!-- feedback note -->
+  <text x="30" y="900" font-size="11" fill="#a3a196" font-style="italic">decision_log.jsonl is what check_recent_decisions</text>
+  <text x="30" y="915" font-size="11" fill="#a3a196" font-style="italic">reads on the next run — this is the memory loop.</text>
+</svg>

@@ -1,40 +1,6 @@
 # Architecture
 
-```mermaid
-flowchart TD
-    subgraph Input
-        A[sample_data/contracts/*.json]
-        M["fetch_contract_attachments_from_inbox\n(Gmail / Outlook / IMAP — extension point,\nnot wired up for this submission)"]
-    end
-
-    CRD[check_recent_decisions\ndecision_log.jsonl] --> REASON{Agent reasoning\nStrands Agents SDK}
-
-    A --> LC[load_contracts]
-    M -.future path.-> LC
-
-    LC --> SR[scan_for_renewals]
-    SR -->|contracts within notice window| REASON
-
-    REASON --> PC[detect_price_changes]
-    REASON --> UC[detect_unfavorable_clauses\ntype-aware: vendor_saas / lease / employment / nda]
-    PC --> REASON
-    UC --> REASON
-
-    REASON -->|decision: cancel / renegotiate| DE[draft_email\n+ optional caveated\nreference_pricing_note]
-    DE --> REASON
-
-    REASON -->|needs a human decision| NH{notify_human\nis_recently_flagged() guard}
-    REASON -->|routine, no action needed| SKIP[quietly skip —\nno tool call]
-
-    NH -->|not a recent duplicate| OUT[outbox/pending_decisions.jsonl]
-    NH -->|already flagged within cooldown\nblocked regardless of model reasoning| SKIP2[no-op —\nnot re-written]
-    NH --> RD[record_decision]
-    SKIP --> RD
-    RD --> LOG[outbox/decision_log.jsonl]
-
-    style SKIP fill:transparent,stroke-dasharray: 5 5
-    style SKIP2 fill:transparent,stroke-dasharray: 5 5
-```
+![Architecture diagram](architecture.svg)
 
 ## Why it's shaped this way
 
