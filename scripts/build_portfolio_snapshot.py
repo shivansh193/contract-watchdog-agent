@@ -4,14 +4,14 @@ Run this after `python -m contract_watchdog.main` (so outbox/*.jsonl
 exists). It re-runs the same deterministic tools the agent used
 (scan_for_renewals, detect_price_changes, detect_unfavorable_clauses —
 none of these call a model, so this is cheap and reproducible) and joins
-the result with what the agent actually decided (outbox/decision_log.jsonl)
-and what it actually notified about (outbox/pending_decisions.jsonl,
-including the drafted email if one exists).
+the result with what the agent actually decided (decision_log.jsonl),
+what it actually notified about (pending_decisions.jsonl), and the real
+drafted email text (drafted_emails.jsonl).
 
-This is the real data pipeline behind the portfolio dashboard concept —
-the design/ dashboard currently embeds a snapshot in this same shape
-rather than fetching it live (published artifacts can't reach back into
-your filesystem), but this script is what would feed a real one.
+This is the file the Next.js frontend reads — see frontend/app/page.tsx.
+There is no live backend call between the two; the frontend just reads
+this JSON snapshot off disk. Re-run this script (and restart/refresh the
+frontend) any time you want it to reflect a fresh agent run.
 """
 
 import json
@@ -24,10 +24,12 @@ sys.path.insert(0, os.path.join(os.path.dirname(__file__), "..", "src"))
 from contract_watchdog.tools.analysis import detect_price_changes, detect_unfavorable_clauses
 from contract_watchdog.tools.contracts import load_contracts, scan_for_renewals
 
-CONTRACTS_DIR = os.path.join(os.path.dirname(__file__), "..", "sample_data", "contracts")
-DECISION_LOG_PATH = os.path.join(os.path.dirname(__file__), "..", "outbox", "decision_log.jsonl")
-PENDING_PATH = os.path.join(os.path.dirname(__file__), "..", "outbox", "pending_decisions.jsonl")
-OUT_PATH = os.path.join(os.path.dirname(__file__), "..", "outbox", "portfolio_snapshot.json")
+ROOT = os.path.join(os.path.dirname(__file__), "..")
+CONTRACTS_DIR = os.path.join(ROOT, "sample_data", "contracts")
+DECISION_LOG_PATH = os.path.join(ROOT, "outbox", "decision_log.jsonl")
+PENDING_PATH = os.path.join(ROOT, "outbox", "pending_decisions.jsonl")
+EMAILS_PATH = os.path.join(ROOT, "outbox", "drafted_emails.jsonl")
+OUT_PATH = os.path.join(ROOT, "outbox", "portfolio_snapshot.json")
 
 
 def _read_jsonl(path: str) -> list[dict]:
@@ -37,12 +39,23 @@ def _read_jsonl(path: str) -> list[dict]:
         return [json.loads(line) for line in f if line.strip()]
 
 
+def _latest_by_contract(entries: list[dict]) -> dict:
+    """Keep only the most recent entry per contract_id (a contract may be reviewed more than once)."""
+    latest: dict[str, dict] = {}
+    for entry in entries:
+        cid = entry["contract_id"]
+        if cid not in latest or entry["timestamp"] > latest[cid]["timestamp"]:
+            latest[cid] = entry
+    return latest
+
+
 def main() -> None:
     contracts = load_contracts(CONTRACTS_DIR)
     due = {c["contract_id"]: c for c in scan_for_renewals(contracts, within_days=10_000)}
 
-    decisions = {d["contract_id"]: d for d in _read_jsonl(DECISION_LOG_PATH)}
+    decisions = _latest_by_contract(_read_jsonl(DECISION_LOG_PATH))
     notifications = {n["contract_id"]: n for n in _read_jsonl(PENDING_PATH)}
+    emails = {e["contract_id"]: e for e in _read_jsonl(EMAILS_PATH)}
 
     today = date.today()
     snapshot = []
@@ -54,6 +67,7 @@ def main() -> None:
         risk = detect_unfavorable_clauses(contract)
         decision = decisions.get(cid)
         notification = notifications.get(cid)
+        email = emails.get(cid)
 
         renewal_date = datetime.strptime(contract["renewal_date"], "%Y-%m-%d").date()
         notice_deadline = annotated.get("notice_deadline")
@@ -63,11 +77,20 @@ def main() -> None:
             else None
         )
 
+        is_flagged = notification is not None
+        reasoning = (
+            notification["summary"] if notification
+            else decision["notes"] if decision
+            else None
+        )
+
         snapshot.append({
             "id": cid,
             "counterparty": contract.get("counterparty"),
             "type": contract.get("contract_type"),
             "description": contract.get("description"),
+            "status": "flagged" if is_flagged else "reviewed",
+            "urgency": notification["urgency"] if notification else None,
             "hasPrice": bool(contract.get("current_price_monthly_usd")),
             "prevPrice": price["previous_price_monthly_usd"],
             "currPrice": price["current_price_monthly_usd"],
@@ -76,17 +99,18 @@ def main() -> None:
             "noticeDeadline": notice_deadline,
             "daysUntil": days_until,
             "risks": risk["risk_matches"],
-            "decision": decision["decision"] if decision else "not_yet_reviewed",
-            "decisionNotes": decision["notes"] if decision else None,
-            "notified": notification is not None,
-            "notificationSummary": notification["summary"] if notification else None,
+            "reasoning": reasoning,
             "recommendedAction": notification["recommended_action"] if notification else None,
-            "urgency": notification["urgency"] if notification else None,
+            "hasEmail": email is not None,
+            "emailSubject": email["email_subject"] if email else None,
+            "emailBody": email["email_body"] if email else None,
+            "referencePricingNote": email["reference_pricing_note"] if email else None,
+            "reviewedAt": decision["timestamp"] if decision else None,
         })
 
     os.makedirs(os.path.dirname(OUT_PATH), exist_ok=True)
     with open(OUT_PATH, "w", encoding="utf-8") as f:
-        json.dump({"generated_at": datetime.now().isoformat(timespec="seconds"), "contracts": snapshot}, f, indent=2)
+        json.dump({"generatedAt": datetime.now().isoformat(timespec="seconds"), "contracts": snapshot}, f, indent=2)
 
     print(f"wrote {OUT_PATH} ({len(snapshot)} contracts)")
 

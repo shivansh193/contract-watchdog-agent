@@ -6,9 +6,19 @@ before an auto-renewal locks in, or opening a renegotiation conversation
 email" isn't the right next step (e.g. an NDA nearing the end of its
 confidentiality term), the agent is expected to use notify_human directly
 with its recommendation instead of calling this tool.
+
+Also persists every draft to outbox/drafted_emails.jsonl — without this,
+the drafted email only ever existed inside the model's own conversation
+and nothing durable downstream (a dashboard, an audit export) could show
+the real text the agent produced.
 """
 
+import json
+import os
+
 from strands import tool
+
+OUTBOX_PATH = os.path.join("outbox", "drafted_emails.jsonl")
 
 _TEMPLATES = {
     "cancel": (
@@ -96,7 +106,7 @@ def draft_email(
     body = _TEMPLATES[decision].format(**fields)
     subject, _, message = body.partition("\n\n")
 
-    return {
+    result = {
         "contract_id": fields["contract_id"],
         "decision": decision,
         "reasoning": reasoning,
@@ -104,3 +114,9 @@ def draft_email(
         "email_subject": subject.replace("Subject: ", "", 1),
         "email_body": message.strip(),
     }
+
+    os.makedirs(os.path.dirname(OUTBOX_PATH), exist_ok=True)
+    with open(OUTBOX_PATH, "a", encoding="utf-8") as f:
+        f.write(json.dumps(result) + "\n")
+
+    return result

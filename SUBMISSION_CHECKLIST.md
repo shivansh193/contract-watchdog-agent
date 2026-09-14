@@ -36,11 +36,12 @@ Pulled directly from the [hackathon's submission requirements](https://agentsfor
 4. Show the terminal summary output — flag that it correctly *skipped* the
    borderline contract (risky language present, but flat price and a
    distant deadline) — that's judgment, not keyword matching.
-5. Switch to the [portfolio dashboard](README.md#portfolio-dashboard):
+5. Switch to the [portfolio dashboard](README.md#portfolio-dashboard-frontend)
+   (`npm run dev` in `frontend/`, reading the real `outbox/portfolio_snapshot.json`):
    click through the flagged contracts, show the matched risk clauses and
    drafted email, click Approve & Send, then flip to the Audit Trail tab
-   to show every decision with its reasoning — this is the same data
-   shape `scripts/build_portfolio_snapshot.py` produces from the real run.
+   to show every decision with its reasoning — all real data from the run
+   you just did, not a mock.
 6. **Run it a second time, live.** Show it does NOT re-notify on the
    contracts it already flagged — `check_recent_decisions` /
    `record_decision` remembering across runs is what makes "autonomous"

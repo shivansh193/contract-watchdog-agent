@@ -149,15 +149,32 @@ Agents SDK**, not a specific model backend. If you hit the Gemini daily
 cap while testing, a second free key from a different Google account
 gets its own separate quota — faster than waiting for reset.
 
-## Portfolio dashboard
+## Portfolio dashboard (frontend/)
 
-A companion UI for the same agent output — a two-tab view (Portfolio /
+A real Next.js app for the same agent output — a two-tab view (Portfolio /
 Audit Trail) showing flagged vs. reviewed contracts, matched risk clauses,
 drafted emails with an Approve & Send interaction, and a full audit trail
-of every decision the agent made. Built with Claude Design, published as
-a standalone artifact; not live-wired to the Python backend (see
-`scripts/build_portfolio_snapshot.py` for the real data pipeline this
-would read from). Working files: [`design/`](design/).
+of every decision the agent made.
+
+It's genuinely wired to real data: a React Server Component reads
+`outbox/portfolio_snapshot.json` straight off disk at request time — no
+mocked content. That snapshot is built by `scripts/build_portfolio_snapshot.py`,
+which joins the deterministic tool output (price/risk detection) with
+what the agent actually decided and the real email text it drafted.
+
+```bash
+# after running the agent at least once (python -m contract_watchdog.main):
+python scripts/build_portfolio_snapshot.py
+
+cd frontend
+npm install
+npm run dev
+# open http://localhost:3000
+```
+
+Re-run the snapshot script (and refresh the page — it always reads fresh
+from disk, no caching) any time you want the dashboard to reflect a new
+agent run.
 
 ## Project structure
 
@@ -177,7 +194,7 @@ contract-watchdog-agent/
 ├── scripts/
 │   ├── generate_sample_data.py
 │   └── build_portfolio_snapshot.py   # real data pipeline behind the dashboard
-├── design/                   # portfolio dashboard working files (Claude Design)
+├── frontend/                 # Next.js portfolio dashboard (reads outbox/portfolio_snapshot.json)
 ├── sample_data/contracts/    # generated demo contracts
 ├── outbox/                   # notify_human + decision_log + portfolio_snapshot
 ├── deploy/agentcore/         # optional Bedrock AgentCore deployment notes
