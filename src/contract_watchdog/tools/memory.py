@@ -19,25 +19,18 @@ from strands import tool
 DECISION_LOG_PATH = os.path.join("outbox", "decision_log.jsonl")
 
 
-@tool
-def check_recent_decisions(cooldown_days: int = 7) -> list[dict]:
-    """Load prior decisions recorded within the cooldown window, before reviewing contracts this run.
+def _load_recent(cooldown_days: int) -> dict[str, dict]:
+    """Latest decision per contract_id within the cooldown window. Plain helper, not an agent tool.
 
-    Call this first, before load_contracts. For any contract_id that
-    already has a recent "flagged_notified" decision, don't notify again
-    this run — the human has already been told. Re-evaluate it normally
-    once its most recent decision falls outside the cooldown window.
-
-    Args:
-        cooldown_days: How many days a prior decision stays valid before
-            the contract should be treated as unreviewed again.
-
-    Returns:
-        A list of {contract_id, decision, notes, timestamp}, most recent
-        decision per contract only.
+    Shared by check_recent_decisions (what the agent sees) and
+    is_recently_flagged (a deterministic guard other tools call directly —
+    see notify.py). Enforcement lives in the guard, not in whether the
+    model correctly acts on what this returns: a live test showed the
+    model can see this data and still re-notify anyway, rationalizing it
+    after the fact. Prompting alone wasn't reliable enough here.
     """
     if not os.path.exists(DECISION_LOG_PATH):
-        return []
+        return {}
 
     cutoff = datetime.now() - timedelta(days=cooldown_days)
     latest_by_contract: dict[str, dict] = {}
@@ -55,7 +48,40 @@ def check_recent_decisions(cooldown_days: int = 7) -> list[dict]:
             if existing is None or ts > datetime.fromisoformat(existing["timestamp"]):
                 latest_by_contract[entry["contract_id"]] = entry
 
-    return list(latest_by_contract.values())
+    return latest_by_contract
+
+
+def is_recently_flagged(contract_id: str, cooldown_days: int = 7) -> bool:
+    """Deterministic check: was this contract already flagged and notified within the cooldown window?
+
+    Not an agent tool — called directly by notify_human so the "don't
+    duplicate a notification" rule is enforced in code, not left to the
+    model to honor on its own.
+    """
+    entry = _load_recent(cooldown_days).get(contract_id)
+    return bool(entry and entry.get("decision") == "flagged_notified")
+
+
+@tool
+def check_recent_decisions(cooldown_days: int = 7) -> list[dict]:
+    """Load prior decisions recorded within the cooldown window, before reviewing contracts this run.
+
+    Call this first, before load_contracts, so your summary can mention
+    what's already been handled. You do not need to remember to skip
+    notify_human yourself for these — it enforces the cooldown on its own
+    — but re-evaluating a contract from scratch when it's already been
+    flagged and notified recently is wasted work, so skip straight to a
+    brief note for those instead of redoing the full analysis.
+
+    Args:
+        cooldown_days: How many days a prior decision stays valid before
+            the contract should be treated as unreviewed again.
+
+    Returns:
+        A list of {contract_id, decision, notes, timestamp}, most recent
+        decision per contract only.
+    """
+    return list(_load_recent(cooldown_days).values())
 
 
 @tool

@@ -20,16 +20,15 @@ flowchart TD
     PC --> REASON
     UC --> REASON
 
-    REASON -->|already flagged within cooldown| SKIP2[skip re-notifying —\nrecord_decision only]
     REASON -->|decision: cancel / renegotiate| DE[draft_email\n+ optional caveated\nreference_pricing_note]
     DE --> REASON
 
-    REASON -->|needs a human decision| NH[notify_human]
+    REASON -->|needs a human decision| NH{notify_human\nis_recently_flagged() guard}
     REASON -->|routine, no action needed| SKIP[quietly skip —\nno tool call]
 
-    NH --> OUT[outbox/pending_decisions.jsonl]
+    NH -->|not a recent duplicate| OUT[outbox/pending_decisions.jsonl]
+    NH -->|already flagged within cooldown\nblocked regardless of model reasoning| SKIP2[no-op —\nnot re-written]
     NH --> RD[record_decision]
-    SKIP2 --> RD
     SKIP --> RD
     RD --> LOG[outbox/decision_log.jsonl]
 
@@ -57,10 +56,13 @@ flowchart TD
 - **Model provider is swappable**, not hardcoded to Bedrock — `agent.py`
   builds whichever provider `MODEL_PROVIDER` selects (Gemini by default,
   Bedrock for the optional AgentCore deployment path, or local Ollama).
-- **Decisions persist across runs.** `check_recent_decisions` /
-  `record_decision` close a real gap a one-shot batch job would otherwise
-  have: without them, running the agent twice over the same contracts
-  re-notifies on everything, every time — which quietly turns "autonomous"
-  into "spam a human learns to ignore." A cooldown window
-  (`DECISION_COOLDOWN_DAYS`) lets an already-handled contract go quiet
-  until it's actually due for re-review.
+- **Decisions persist across runs, and the guard is in the tool, not the
+  prompt.** `check_recent_decisions` / `record_decision` close a real gap
+  a one-shot batch job would otherwise have: without them, running the
+  agent twice over the same contracts re-notifies on everything, every
+  time. The system prompt tells the agent to check first — but a live
+  test proved that instruction alone isn't reliable: the model saw the
+  prior decision, re-notified anyway, and narrated a false justification
+  for doing so. `notify_human` now enforces the cooldown itself
+  (`is_recently_flagged()`), so a duplicate notification is blocked
+  regardless of what the model's reasoning concludes.

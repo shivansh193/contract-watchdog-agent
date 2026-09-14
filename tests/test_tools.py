@@ -16,6 +16,7 @@ from contract_watchdog.tools.analysis import detect_price_changes, detect_unfavo
 from contract_watchdog.tools.contracts import scan_for_renewals
 from contract_watchdog.tools.drafting import draft_email
 import contract_watchdog.tools.memory as memory
+import contract_watchdog.tools.notify as notify
 
 
 def _future(days: int) -> str:
@@ -199,3 +200,77 @@ def test_decision_memory_keeps_only_latest_per_contract(tmp_path, monkeypatch):
 
     assert len(recent) == 1
     assert recent[0]["decision"] == "flagged_notified"
+
+
+def test_notify_human_blocks_duplicate_within_cooldown(tmp_path, monkeypatch):
+    """Regression test for a real bug found via live testing: the model re-notified
+    on an already-flagged contract and fabricated a justification for doing so.
+    Enforcement now lives in the tool itself, not just the prompt."""
+    decision_log = tmp_path / "outbox" / "decision_log.jsonl"
+    decision_log.parent.mkdir(parents=True)
+    prior_decision = {
+        "timestamp": datetime.now().isoformat(timespec="seconds"),
+        "contract_id": "CH-2024-118",
+        "decision": "flagged_notified",
+        "notes": "",
+    }
+    decision_log.write_text(json.dumps(prior_decision) + "\n", encoding="utf-8")
+    monkeypatch.setattr(memory, "DECISION_LOG_PATH", str(decision_log))
+
+    pending_path = tmp_path / "outbox" / "pending_decisions.jsonl"
+    monkeypatch.setattr(notify, "OUTBOX_PATH", str(pending_path))
+
+    result = notify.notify_human(
+        contract_id="CH-2024-118",
+        counterparty="CloudHost Inc.",
+        summary="price hike",
+        recommended_action="renegotiate",
+        urgency="high",
+    )
+
+    assert result["notified"] is False
+    assert "skipped_reason" in result
+    assert not pending_path.exists()
+
+
+def test_notify_human_allows_first_notification(tmp_path, monkeypatch):
+    monkeypatch.setattr(memory, "DECISION_LOG_PATH", str(tmp_path / "outbox" / "decision_log.jsonl"))
+    pending_path = tmp_path / "outbox" / "pending_decisions.jsonl"
+    monkeypatch.setattr(notify, "OUTBOX_PATH", str(pending_path))
+
+    result = notify.notify_human(
+        contract_id="CH-2024-118",
+        counterparty="CloudHost Inc.",
+        summary="price hike",
+        recommended_action="renegotiate",
+        urgency="high",
+    )
+
+    assert result["notified"] is True
+    assert pending_path.exists()
+
+
+def test_notify_human_allows_after_cooldown_expires(tmp_path, monkeypatch):
+    decision_log = tmp_path / "outbox" / "decision_log.jsonl"
+    decision_log.parent.mkdir(parents=True)
+    stale_decision = {
+        "timestamp": (datetime.now() - timedelta(days=30)).isoformat(timespec="seconds"),
+        "contract_id": "CH-2024-118",
+        "decision": "flagged_notified",
+        "notes": "",
+    }
+    decision_log.write_text(json.dumps(stale_decision) + "\n", encoding="utf-8")
+    monkeypatch.setattr(memory, "DECISION_LOG_PATH", str(decision_log))
+
+    pending_path = tmp_path / "outbox" / "pending_decisions.jsonl"
+    monkeypatch.setattr(notify, "OUTBOX_PATH", str(pending_path))
+
+    result = notify.notify_human(
+        contract_id="CH-2024-118",
+        counterparty="CloudHost Inc.",
+        summary="price hike again",
+        recommended_action="renegotiate",
+        urgency="high",
+    )
+
+    assert result["notified"] is True

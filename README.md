@@ -55,11 +55,25 @@ which undercuts the "autonomous" pitch — a human learns to ignore repeat
 pings fast.
 
 - **`check_recent_decisions`** — called first, every run. Loads what the
-  agent already decided recently (`outbox/decision_log.jsonl`) so an
-  already-flagged contract doesn't get re-notified within the cooldown
-  window (`DECISION_COOLDOWN_DAYS` in `.env`, default 7).
+  agent already decided recently (`outbox/decision_log.jsonl`) so it
+  doesn't waste a full re-analysis on a contract already handled within
+  the cooldown window (`DECISION_COOLDOWN_DAYS` in `.env`, default 7).
 - **`record_decision`** — called once per contract reviewed, every run
   (flagged or not), so the next run has something to check against.
+
+**The actual enforcement lives in `notify_human` itself, not in the
+prompt.** A live two-run test during development caught a real failure
+mode: the model saw `check_recent_decisions` correctly return the prior
+"flagged_notified" entry, re-notified anyway, and narrated a false
+justification for why it was fine ("the timestamp fell outside the
+cooldown window" — it hadn't; the two runs were a minute apart). That's
+the concrete risk of relying on prompting alone for something that needs
+to actually be reliable. The fix: `notify_human` now checks
+`is_recently_flagged()` itself before writing anything, and no-ops on a
+within-cooldown duplicate regardless of what the model decides to do —
+verified with a regression test (`test_notify_human_blocks_duplicate_within_cooldown`)
+and re-confirmed live: a second run correctly logged 2 contracts as
+already-known/deduplicated instead of re-notifying.
 
 `MIN_FLAG_VALUE_USD` (`.env`) sets a dollar floor: contracts below it only
 get surfaced for high-confidence risk (2+ matched clauses, or a real
@@ -125,7 +139,7 @@ Set `MODEL_PROVIDER` in `.env` to one of:
 
 | Value | Provider | Cost | Setup |
 |---|---|---|---|
-| `gemini` (default) | Google Gemini (`gemini-3.6-flash`) | **Free tier, no card** — but capped at **20 requests/day per model** on the free tier, not per-minute; a handful of test runs can exhaust it for the day | API key from [aistudio.google.com](https://aistudio.google.com/apikey) |
+| `gemini` (default) | Google Gemini (`gemini-flash-lite-latest`) | **Free tier, no card.** The flagship `gemini-3.6-flash` is capped at 20 requests/**day** on the free tier — not enough for one full run of this agent (needs 15-20+ model turns across 5 contracts). The `-lite` tier carries much more free headroom and is what this project is actually verified against; swap `GEMINI_MODEL_ID` if you want the flagship model instead | API key from [aistudio.google.com](https://aistudio.google.com/apikey) |
 | `bedrock` | AWS Bedrock (Claude) | Pay-per-token (cents for a demo) | AWS credentials with `bedrock:InvokeModel` |
 | `ollama` | Local open model | Free, no quota, runs on your machine | [ollama.com](https://ollama.com) + `ollama pull llama3` |
 

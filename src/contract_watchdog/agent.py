@@ -88,7 +88,12 @@ def _get_model():
         from strands.models import GeminiModel
 
         return GeminiModel(
-            model_id=os.getenv("GEMINI_MODEL_ID", "gemini-3.6-flash"),
+            # gemini-3.6-flash's free tier is 20 requests/DAY, which isn't
+            # enough headroom for one full run of this agent (it needs
+            # 15-20+ model turns across 5 contracts and 8 tools). The
+            # -lite tier carries a much higher free quota and is what
+            # this project is actually verified against.
+            model_id=os.getenv("GEMINI_MODEL_ID", "gemini-flash-lite-latest"),
             client_args={"api_key": os.environ["GEMINI_API_KEY"]},
         )
 

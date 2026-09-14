@@ -17,6 +17,8 @@ from datetime import datetime
 
 from strands import tool
 
+from .memory import is_recently_flagged
+
 OUTBOX_PATH = os.path.join("outbox", "pending_decisions.jsonl")
 
 
@@ -30,6 +32,11 @@ def notify_human(
 ) -> dict:
     """Surface a contract decision to the human owner. Use only for contracts that genuinely need a decision — not a status update on every contract reviewed.
 
+    Safe to call even if you're not sure whether this contract was already
+    flagged recently — this tool checks for you and no-ops rather than
+    duplicating a notification within the cooldown window
+    (DECISION_COOLDOWN_DAYS in .env, default 7).
+
     Args:
         contract_id: The contract this notification is about.
         counterparty: The other party's name (vendor, landlord, employer, ...), for a scannable notification.
@@ -41,9 +48,22 @@ def notify_human(
             to look at this.
 
     Returns:
-        A dict confirming the notification was recorded, with a path to
-        where a human can review it.
+        A dict confirming the notification was recorded (notified: True),
+        or confirming it was skipped as a within-cooldown duplicate
+        (notified: False, skipped_reason: ...).
     """
+    cooldown_days = int(os.getenv("DECISION_COOLDOWN_DAYS", "7"))
+
+    if is_recently_flagged(contract_id, cooldown_days=cooldown_days):
+        return {
+            "notified": False,
+            "contract_id": contract_id,
+            "skipped_reason": (
+                f"Already flagged and notified for {contract_id} within the "
+                f"last {cooldown_days} days — not duplicating the notification."
+            ),
+        }
+
     os.makedirs(os.path.dirname(OUTBOX_PATH), exist_ok=True)
 
     entry = {
