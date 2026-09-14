@@ -1,0 +1,12 @@
+{
+  "vendor": "CloudHost Inc.",
+  "contract_id": "CH-2024-118",
+  "service": "Production cloud hosting",
+  "current_price_monthly_usd": 1450,
+  "previous_price_monthly_usd": 1100,
+  "renewal_date": "2026-10-04",
+  "auto_renew": true,
+  "notice_period_days": 15,
+  "contract_excerpt": "This Agreement shall automatically renew for successive one-year terms unless either party provides written notice at least fifteen (15) days prior to the renewal date. Vendor may, in its sole discretion, adjust pricing for the renewal term without notice.",
+  "owner_email": "founder@example.com"
+}

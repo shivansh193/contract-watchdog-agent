@@ -1,0 +1,12 @@
+{
+  "vendor": "SignalCRM",
+  "contract_id": "SC-2026-044",
+  "service": "CRM platform",
+  "current_price_monthly_usd": 240,
+  "previous_price_monthly_usd": 240,
+  "renewal_date": "2027-02-11",
+  "auto_renew": true,
+  "notice_period_days": 60,
+  "contract_excerpt": "Subscription automatically renews. Fees are non-refundable. Vendor reserves the right to modify these terms unilaterally with notice posted to the Vendor's website.",
+  "owner_email": "founder@example.com"
+}

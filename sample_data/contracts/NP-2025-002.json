@@ -1,0 +1,12 @@
+{
+  "vendor": "Northwind Payroll",
+  "contract_id": "NP-2025-002",
+  "service": "Payroll processing",
+  "current_price_monthly_usd": 89,
+  "previous_price_monthly_usd": 89,
+  "renewal_date": "2027-04-12",
+  "auto_renew": true,
+  "notice_period_days": 30,
+  "contract_excerpt": "This Agreement renews annually. Either party may cancel by providing thirty (30) days written notice prior to renewal. Pricing is fixed for the term of this Agreement.",
+  "owner_email": "founder@example.com"
+}
