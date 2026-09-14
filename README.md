@@ -36,18 +36,47 @@ decide something — not on every contract, every day.
    at-will language for employment; perpetual/survival terms for NDAs).
 5. **`draft_email`** — for any contract the agent decides needs action,
    drafts a cancellation or renegotiation email ready for a human to review
-   and send.
+   and send. Can optionally include a `reference_pricing_note` — a general
+   sense of market rate from the model's own knowledge — but only ever as
+   an internal note explicitly labeled *unverified, confirm before using*,
+   never stated as fact to the counterparty. There's no real pricing data
+   source wired in; pretending otherwise would be worse than omitting it.
 6. **`notify_human`** — the one tool that actually interrupts a person.
    The agent is instructed to call this *only* when a real decision is
    needed (imminent deadline + risk found), not for every contract it
    reviews. In this scaffold it writes to `outbox/pending_decisions.jsonl`
    — swap this for a Slack webhook or SES email call for a live demo.
 
+### Memory and trust controls
+
+Two more tools close a real gap: without them, running the agent twice
+over the same contracts would re-notify on everything again every time,
+which undercuts the "autonomous" pitch — a human learns to ignore repeat
+pings fast.
+
+- **`check_recent_decisions`** — called first, every run. Loads what the
+  agent already decided recently (`outbox/decision_log.jsonl`) so an
+  already-flagged contract doesn't get re-notified within the cooldown
+  window (`DECISION_COOLDOWN_DAYS` in `.env`, default 7).
+- **`record_decision`** — called once per contract reviewed, every run
+  (flagged or not), so the next run has something to check against.
+
+`MIN_FLAG_VALUE_USD` (`.env`) sets a dollar floor: contracts below it only
+get surfaced for high-confidence risk (2+ matched clauses, or a real
+consequence like an NDA expiring), not a single keyword match on a
+trivial subscription. Set it to `0` (default) to judge purely on risk,
+ignoring price.
+
 `mail_ingest.py` documents (but does not implement) pulling new contracts
 straight from Gmail/Outlook/IMAP instead of a local folder — see that
 file's docstring for why it's an intentional extension point rather than a
 live integration in this submission, and what wiring it up for real looks
-like.
+like. `email_sender.py` is the opposite case: a fully working SMTP sender
+(Gmail app-password auth, no OAuth needed) that's deliberately *not*
+registered as a default agent tool — an agent that can email a real
+counterparty unattended is a meaningfully bigger blast radius than one
+that drafts and waits for a human to hit send, and that's not a decision
+to default into silently. See that file's docstring to enable it.
 
 The agent runs the whole loop end-to-end from one prompt: "review the
 contracts, handle what needs handling, only bother me with real decisions."
@@ -96,33 +125,59 @@ Set `MODEL_PROVIDER` in `.env` to one of:
 
 | Value | Provider | Cost | Setup |
 |---|---|---|---|
-| `gemini` (default) | Google Gemini 2.5 Flash | **Free tier, no card** | API key from [aistudio.google.com](https://aistudio.google.com/apikey) |
+| `gemini` (default) | Google Gemini (`gemini-3.6-flash`) | **Free tier, no card** — but capped at **20 requests/day per model** on the free tier, not per-minute; a handful of test runs can exhaust it for the day | API key from [aistudio.google.com](https://aistudio.google.com/apikey) |
 | `bedrock` | AWS Bedrock (Claude) | Pay-per-token (cents for a demo) | AWS credentials with `bedrock:InvokeModel` |
-| `ollama` | Local open model | Free, runs on your machine | [ollama.com](https://ollama.com) + `ollama pull llama3` |
+| `ollama` | Local open model | Free, no quota, runs on your machine | [ollama.com](https://ollama.com) + `ollama pull llama3` |
 
 Using Bedrock is a nice-to-have for the "built on AWS" story in the demo
 video, not a requirement — the hackathon only requires the **Strands
-Agents SDK**, not a specific model backend.
+Agents SDK**, not a specific model backend. If you hit the Gemini daily
+cap while testing, a second free key from a different Google account
+gets its own separate quota — faster than waiting for reset.
+
+## Portfolio dashboard
+
+A companion UI for the same agent output — a two-tab view (Portfolio /
+Audit Trail) showing flagged vs. reviewed contracts, matched risk clauses,
+drafted emails with an Approve & Send interaction, and a full audit trail
+of every decision the agent made. Built with Claude Design, published as
+a standalone artifact; not live-wired to the Python backend (see
+`scripts/build_portfolio_snapshot.py` for the real data pipeline this
+would read from). Working files: [`design/`](design/).
 
 ## Project structure
 
 ```
 contract-watchdog-agent/
 ├── src/contract_watchdog/
-│   ├── agent.py            # builds the Strands Agent + system prompt
-│   ├── main.py              # CLI entrypoint
+│   ├── agent.py             # builds the Strands Agent + system prompt
+│   ├── main.py               # CLI entrypoint
 │   └── tools/
-│       ├── contracts.py     # load_contracts, scan_for_renewals
-│       ├── analysis.py      # detect_price_changes, detect_unfavorable_clauses
-│       ├── drafting.py      # draft_email
-│       ├── notify.py        # notify_human (the "surface to a human" tool)
-│       └── mail_ingest.py   # Gmail/Outlook/IMAP extension point (not live)
-├── scripts/generate_sample_data.py
-├── sample_data/contracts/   # generated demo contracts
-├── outbox/                  # where notify_human writes flagged decisions
-├── deploy/agentcore/        # optional Bedrock AgentCore deployment notes
+│       ├── contracts.py      # load_contracts, scan_for_renewals
+│       ├── analysis.py       # detect_price_changes, detect_unfavorable_clauses
+│       ├── drafting.py       # draft_email (+ reference_pricing_note)
+│       ├── notify.py         # notify_human (the "surface to a human" tool)
+│       ├── memory.py         # check_recent_decisions, record_decision
+│       ├── mail_ingest.py    # Gmail/Outlook/IMAP extension point (not live)
+│       └── email_sender.py   # real SMTP send, opt-in, not a default tool
+├── scripts/
+│   ├── generate_sample_data.py
+│   └── build_portfolio_snapshot.py   # real data pipeline behind the dashboard
+├── design/                   # portfolio dashboard working files (Claude Design)
+├── sample_data/contracts/    # generated demo contracts
+├── outbox/                   # notify_human + decision_log + portfolio_snapshot
+├── deploy/agentcore/         # optional Bedrock AgentCore deployment notes
 └── tests/test_tools.py
 ```
+
+## Business model (for the pitch, not the code)
+
+Charge a percentage of dollars actually renegotiated or saved, not a flat
+subscription — "we only make money when we save you money." Incentive-
+aligned, and it's a strong one-liner for a demo close. Distribution: sell
+through fractional CFOs and bookkeeping firms (Bench/Pilot-style) as a
+feature they offer their existing clients, rather than direct-to-founder
+acquisition from scratch.
 
 ## Submission checklist
 

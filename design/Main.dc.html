@@ -1,0 +1,379 @@
+<!doctype html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Spectral:wght@500;600;700&family=IBM+Plex+Sans:wght@400;500;600;700&display=swap">
+  <style>
+    * { box-sizing: border-box; }
+    body { margin: 0; }
+    a { color: #1c3d5a; text-decoration: none; }
+    a:hover { color: #142a3f; text-decoration: underline; }
+    .cw-tab { cursor: pointer; }
+    .cw-row { cursor: pointer; }
+  </style>
+</helmet>
+
+<div style="min-height: 100%; width: 100%; background: #f7f5f0; font-family: 'IBM Plex Sans', system-ui, sans-serif; color: #1a1a17;">
+  <div style="max-width: 1320px; margin: 0 auto; padding: 40px 32px 96px;">
+
+    <div style="display:flex; justify-content:space-between; align-items:flex-end; margin-bottom:32px; gap:16px; flex-wrap:wrap;">
+      <div>
+        <div style="font-family:'Spectral', Georgia, serif; font-weight:700; font-size:30px; letter-spacing:-0.01em; color:#141310;">Contract Watchdog</div>
+        <div style="font-size:14px; color:#6b6a60; margin-top:6px;">Autonomous obligation monitoring &mdash; vendor, lease, employment &amp; NDA agreements</div>
+      </div>
+      <div style="text-align:right; font-size:12px; color:#8a887c;">
+        <div>Last agent run</div>
+        <div style="font-weight:600; color:#3d3c35; margin-top:2px;">Sep 14, 2026 &middot; 6:54 PM</div>
+      </div>
+    </div>
+
+    <div style="display:grid; grid-template-columns:repeat(4, minmax(0,1fr)); gap:16px; margin-bottom:36px;">
+      <div style="background:#ffffff; border:1px solid #e6e2d6; border-radius:3px; padding:18px 20px;">
+        <div style="font-size:11px; text-transform:uppercase; letter-spacing:0.06em; color:#8a887c; font-weight:600;">Contracts monitored</div>
+        <div style="font-family:'Spectral', Georgia, serif; font-size:28px; font-weight:600; color:#141310; margin-top:6px;">{{totalCount}}</div>
+      </div>
+      <div style="background:#fbf0e2; border:1px solid #eecfa0; border-radius:3px; padding:18px 20px;">
+        <div style="display:flex; align-items:center; gap:6px; font-size:11px; text-transform:uppercase; letter-spacing:0.06em; color:#9a5a12; font-weight:600;">
+          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M10.29 3.86 1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0Z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+          <span>Needs attention</span>
+        </div>
+        <div style="font-family:'Spectral', Georgia, serif; font-size:28px; font-weight:600; color:#9a5a12; margin-top:6px;">{{flaggedCount}}</div>
+      </div>
+      <div style="background:#ffffff; border:1px solid #e6e2d6; border-radius:3px; padding:18px 20px;">
+        <div style="font-size:11px; text-transform:uppercase; letter-spacing:0.06em; color:#8a887c; font-weight:600;">Reviewed, no action</div>
+        <div style="font-family:'Spectral', Georgia, serif; font-size:28px; font-weight:600; color:#141310; margin-top:6px;">{{reviewedCount}}</div>
+      </div>
+      <div style="background:#ffffff; border:1px solid #e6e2d6; border-radius:3px; padding:18px 20px;">
+        <div style="font-size:11px; text-transform:uppercase; letter-spacing:0.06em; color:#8a887c; font-weight:600;">Monthly spend tracked</div>
+        <div style="font-family:'Spectral', Georgia, serif; font-size:28px; font-weight:600; color:#141310; margin-top:6px;">${{totalMonthly}}</div>
+        <div style="font-size:11px; color:#a3a196; margin-top:2px;">across {{pricedCount}} priced contracts</div>
+      </div>
+    </div>
+
+    <div style="display:flex; gap:28px; border-bottom:1px solid #e6e2d6; margin-bottom:28px;">
+      <div class="cw-tab" onClick="{{selectPortfolioTab}}" style="padding-bottom:12px; border-bottom:2px solid {{portfolioTabBorder}}; color:{{portfolioTabColor}}; font-weight:600; font-size:14px;">Portfolio</div>
+      <div class="cw-tab" onClick="{{selectAuditTab}}" style="padding-bottom:12px; border-bottom:2px solid {{auditTabBorder}}; color:{{auditTabColor}}; font-weight:600; font-size:14px;">Audit Trail</div>
+    </div>
+
+    <sc-if value="{{isPortfolio}}" hint-placeholder-val="{{true}}">
+    <div style="display:grid; grid-template-columns:360px minmax(0,1fr); gap:24px; align-items:start;">
+
+      <div style="display:flex; flex-direction:column; gap:8px;">
+        <sc-for list="{{contracts}}" as="c" hint-placeholder-count="5">
+          <div class="cw-row" onClick="{{c.select}}" style="background:{{c.rowBg}}; border:1px solid {{c.rowBorderColor}}; border-left:3px solid {{c.rowBorderColor}}; border-radius:3px; padding:14px 16px;">
+            <div style="display:flex; justify-content:space-between; align-items:flex-start; gap:8px;">
+              <div style="font-weight:600; font-size:14px; color:#1a1a17;">{{c.counterparty}}</div>
+              <div style="font-size:10px; font-weight:600; padding:3px 8px; border-radius:10px; background:{{c.statusBg}}; color:{{c.statusColor}}; white-space:nowrap;">{{c.statusLabel}}</div>
+            </div>
+            <div style="font-size:12px; color:#8a887c; margin-top:2px;">{{c.type}} &middot; {{c.description}}</div>
+            <div style="font-size:11px; color:#a3a196; margin-top:8px;">Notice deadline in {{c.daysUntil}} days</div>
+          </div>
+        </sc-for>
+      </div>
+
+      <div style="background:#ffffff; border:1px solid #e6e2d6; border-radius:3px; padding:32px;">
+        <div style="display:flex; justify-content:space-between; align-items:flex-start; gap:16px; flex-wrap:wrap;">
+          <div>
+            <div style="font-family:'Spectral', Georgia, serif; font-size:22px; font-weight:600; color:#141310;">{{selected.counterparty}}</div>
+            <div style="font-size:13px; color:#8a887c; margin-top:4px;">{{selected.type}} &middot; {{selected.description}}</div>
+          </div>
+          <sc-if value="{{selected.isFlagged}}" hint-placeholder-val="{{true}}">
+            <div style="display:flex; align-items:center; gap:6px; font-size:11px; font-weight:600; padding:5px 10px; border-radius:10px; background:#fbe1d1; color:#9a3d12; white-space:nowrap;">
+              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M10.29 3.86 1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0Z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+              {{selected.urgency}} urgency
+            </div>
+          </sc-if>
+        </div>
+
+        <div style="display:grid; grid-template-columns:repeat(3, minmax(0,1fr)); gap:16px; margin-top:24px; padding-top:24px; border-top:1px solid #eeebe2;">
+          <div>
+            <div style="font-size:11px; text-transform:uppercase; letter-spacing:0.05em; color:#a3a196; font-weight:600;">Renewal date</div>
+            <div style="font-size:14px; color:#1a1a17; margin-top:4px; font-weight:500;">{{selected.renewalDate}}</div>
+          </div>
+          <div>
+            <div style="display:flex; align-items:center; gap:5px; font-size:11px; text-transform:uppercase; letter-spacing:0.05em; color:#a3a196; font-weight:600;">
+              <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+              Notice deadline
+            </div>
+            <div style="font-size:14px; color:#1a1a17; margin-top:4px; font-weight:500;">{{selected.noticeDeadline}} &middot; {{selected.daysUntil}}d</div>
+          </div>
+          <sc-if value="{{selected.hasPrice}}" hint-placeholder-val="{{true}}">
+            <div>
+              <div style="font-size:11px; text-transform:uppercase; letter-spacing:0.05em; color:#a3a196; font-weight:600;">Monthly price</div>
+              <div style="font-size:14px; color:{{selected.priceColor}}; margin-top:4px; font-weight:500;">${{selected.prevPrice}} &rarr; ${{selected.currPrice}}<sc-if value="{{selected.hasIncrease}}" hint-placeholder-val="{{true}}"> ({{selected.pctChange}}%)</sc-if></div>
+            </div>
+          </sc-if>
+        </div>
+
+        <div style="margin-top:28px;">
+          <div style="font-size:12px; text-transform:uppercase; letter-spacing:0.05em; color:#8a887c; font-weight:600; margin-bottom:10px;">Risk clauses detected</div>
+          <sc-if value="{{selected.hasRisks}}" hint-placeholder-val="{{true}}">
+            <div style="display:flex; flex-direction:column; gap:8px;">
+              <sc-for list="{{selected.risks}}" as="r" hint-placeholder-count="2">
+                <div style="display:flex; gap:10px; background:#faf8f2; border:1px solid #eeebe2; border-radius:3px; padding:12px 14px;">
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#b5540c" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink:0; margin-top:2px;"><path d="M10.29 3.86 1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0Z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+                  <div>
+                    <div style="font-size:12px; font-weight:600; color:#1a1a17; font-style:italic;">&ldquo;{{r.phrase}}&rdquo;</div>
+                    <div style="font-size:12px; color:#6b6a60; margin-top:2px;">{{r.reason}}</div>
+                  </div>
+                </div>
+              </sc-for>
+            </div>
+          </sc-if>
+          <sc-if value="{{selected.hasNoRisks}}" hint-placeholder-val="{{false}}">
+            <div style="display:flex; align-items:center; gap:8px; font-size:13px; color:#5c6b5c;">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#4a7a4a" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="m9 12 2 2 4-4"/></svg>
+              No risk language detected in this contract's terms.
+            </div>
+          </sc-if>
+        </div>
+
+        <sc-if value="{{selected.hasEmail}}" hint-placeholder-val="{{true}}">
+          <div style="margin-top:28px; padding-top:24px; border-top:1px solid #eeebe2;">
+            <div style="font-size:12px; text-transform:uppercase; letter-spacing:0.05em; color:#8a887c; font-weight:600; margin-bottom:10px;">Drafted response &mdash; awaiting approval</div>
+            <div style="background:#faf8f2; border:1px solid #eeebe2; border-radius:3px; padding:18px 20px;">
+              <div style="font-size:13px; font-weight:600; color:#1a1a17; margin-bottom:8px;">{{selected.emailSubject}}</div>
+              <div style="font-size:13px; color:#4a4940; line-height:1.6; white-space:pre-line;">{{selected.emailBody}}</div>
+              <div style="margin-top:16px;">
+                <sc-if value="{{selected.isSent}}" hint-placeholder-val="{{false}}">
+                  <div style="display:inline-flex; align-items:center; gap:6px; font-size:13px; font-weight:600; color:#3d6b3d; background:#e3ede3; padding:8px 16px; border-radius:3px;">
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="m9 12 2 2 4-4"/></svg>
+                    Approved &amp; queued to send
+                  </div>
+                </sc-if>
+                <sc-if value="{{selected.isNotSent}}" hint-placeholder-val="{{true}}">
+                  <div onClick="{{selected.approveEmail}}" style="display:inline-block; cursor:pointer; font-size:13px; font-weight:600; color:#ffffff; background:{{accent}}; padding:9px 18px; border-radius:3px;">
+                    Approve &amp; Send
+                  </div>
+                </sc-if>
+              </div>
+            </div>
+          </div>
+        </sc-if>
+
+        <sc-if value="{{selected.isReviewedOnly}}" hint-placeholder-val="{{false}}">
+          <div style="margin-top:28px; padding-top:24px; border-top:1px solid #eeebe2;">
+            <div style="font-size:12px; text-transform:uppercase; letter-spacing:0.05em; color:#8a887c; font-weight:600; margin-bottom:10px;">Agent's reasoning</div>
+            <div style="background:#faf8f2; border:1px solid #eeebe2; border-radius:3px; padding:16px 18px; font-size:13px; color:#4a4940; line-height:1.6;">{{selected.reasoning}}</div>
+          </div>
+        </sc-if>
+
+      </div>
+    </div>
+    </sc-if>
+
+    <sc-if value="{{isAudit}}" hint-placeholder-val="{{false}}">
+      <div style="background:#ffffff; border:1px solid #e6e2d6; border-radius:3px;">
+        <sc-for list="{{auditLog}}" as="a" hint-placeholder-count="5">
+          <div style="display:flex; gap:20px; padding:18px 24px; border-bottom:1px solid #eeebe2;">
+            <div style="width:80px; flex-shrink:0; font-size:12px; color:#a3a196; padding-top:2px;">{{a.time}}</div>
+            <div style="width:130px; flex-shrink:0;">
+              <div style="display:inline-block; font-size:10px; font-weight:600; padding:3px 8px; border-radius:10px; background:{{a.outcomeBg}}; color:{{a.outcomeColor}};">{{a.outcomeLabel}}</div>
+            </div>
+            <div>
+              <div style="font-size:13px; font-weight:600; color:#1a1a17;">{{a.name}}</div>
+              <div style="font-size:13px; color:#6b6a60; margin-top:3px; line-height:1.5;">{{a.text}}</div>
+            </div>
+          </div>
+        </sc-for>
+      </div>
+    </sc-if>
+
+  </div>
+</div>
+</x-dc>
+<script data-dc-script data-props='{"accent":{"editor":"color","default":"#1c3d5a","options":["#1c3d5a","#2f4f3f","#5a3d1c","#3d3c37"]}}'>
+class Component extends DCLogic {
+  renderVals() {
+    const accent = this.props.accent ?? '#1c3d5a';
+    const state = this.state || {};
+    const selectedId = state.selectedId ?? 'CH-2024-118';
+    const tab = state.tab ?? 'portfolio';
+    const approved = state.approved ?? {};
+
+    const RAW = [
+      {
+        id: 'CH-2024-118',
+        counterparty: 'CloudHost Inc.',
+        type: 'Vendor / SaaS',
+        description: 'Production cloud hosting',
+        hasPrice: true,
+        prevPrice: 1100,
+        currPrice: 1450,
+        renewalDate: 'Oct 4, 2026',
+        noticeDeadline: 'Sep 19, 2026',
+        daysUntil: 5,
+        status: 'flagged',
+        urgency: 'High',
+        risks: [
+          { phrase: 'sole discretion', reason: 'Vendor can change terms unilaterally.' },
+          { phrase: 'without notice', reason: 'Vendor may act (e.g. change price) without warning.' },
+          { phrase: 'automatically renew', reason: 'Auto-renews without active opt-in.' }
+        ],
+        reasoning: '31.8% price increase ($1,100 → $1,450/mo) combined with a sole-discretion pricing clause and a notice deadline just 5 days away.',
+        hasEmail: true,
+        emailSubject: 'Renewal Terms for CH-2024-118 — Requesting a Call',
+        emailBody: "Hi CloudHost Inc. team,\n\nOur production cloud hosting agreement (CH-2024-118) is coming up for renewal on Oct 4, 2026. We've noticed the price has moved from $1,100/mo to $1,450/mo. Before we renew, we'd like to discuss the terms. Could we get 15 minutes this week to talk through options?\n\nThanks,\nFounder"
+      },
+      {
+        id: 'LEASE-2023-07',
+        counterparty: 'Meridian Properties LLC',
+        type: 'Lease',
+        description: 'Office space lease, Suite 400',
+        hasPrice: false,
+        renewalDate: 'Oct 19, 2026',
+        noticeDeadline: 'Sep 19, 2026',
+        daysUntil: 5,
+        status: 'flagged',
+        urgency: 'High',
+        risks: [
+          { phrase: 'security deposit is non-refundable', reason: 'Deposit forfeiture regardless of unit condition.' },
+          { phrase: 'landlord may enter without', reason: 'Landlord can enter with little/no notice.' },
+          { phrase: 'early termination fee', reason: 'Breaking the lease early carries a penalty.' }
+        ],
+        reasoning: 'Notice deadline in 5 days combined with a non-refundable deposit clause and an unannounced-entry clause.',
+        hasEmail: true,
+        emailSubject: 'Renewal Terms for LEASE-2023-07 — Requesting a Call',
+        emailBody: "Hi Meridian Properties LLC team,\n\nOur office space lease, Suite 400 agreement (LEASE-2023-07) is coming up for renewal on Oct 19, 2026. Before we renew, we'd like to discuss the terms. Could we get 15 minutes this week to talk through options?\n\nThanks,\nFounder"
+      },
+      {
+        id: 'SC-2026-044',
+        counterparty: 'SignalCRM',
+        type: 'Vendor / SaaS',
+        description: 'CRM platform',
+        hasPrice: true,
+        prevPrice: 240,
+        currPrice: 240,
+        renewalDate: 'Feb 11, 2027',
+        noticeDeadline: 'Dec 13, 2026',
+        daysUntil: 90,
+        status: 'reviewed',
+        urgency: null,
+        risks: [
+          { phrase: 'non-refundable', reason: 'No refund path if you cancel after billing.' },
+          { phrase: 'unilaterally', reason: 'Vendor can change terms unilaterally.' }
+        ],
+        reasoning: 'Risky clause language detected, but price is unchanged and the notice deadline isn’t imminent — not urgent enough to interrupt yet. Will re-evaluate as the deadline approaches.',
+        hasEmail: false
+      },
+      {
+        id: 'NP-2025-002',
+        counterparty: 'Northwind Payroll',
+        type: 'Vendor / SaaS',
+        description: 'Payroll processing',
+        hasPrice: true,
+        prevPrice: 89,
+        currPrice: 89,
+        renewalDate: 'Apr 12, 2027',
+        noticeDeadline: 'Mar 13, 2027',
+        daysUntil: 180,
+        status: 'reviewed',
+        urgency: null,
+        risks: [],
+        reasoning: 'Routine renewal — flat pricing, no risky clauses, deadline is 6+ months out.',
+        hasEmail: false
+      },
+      {
+        id: 'NDA-2026-011',
+        counterparty: 'Anthea Design Studio',
+        type: 'NDA',
+        description: 'Mutual NDA for contract design work',
+        hasPrice: false,
+        renewalDate: 'Oct 19, 2027',
+        noticeDeadline: '—',
+        daysUntil: 400,
+        status: 'reviewed',
+        urgency: null,
+        risks: [],
+        reasoning: 'No recurring price, no risky clauses, auto-renew disabled. No action needed.',
+        hasEmail: false
+      }
+    ];
+
+    const STATUS_STYLE = {
+      flagged: { label: 'Needs attention', color: '#9a5a12', bg: '#fbe9d9' },
+      reviewed: { label: 'Reviewed — no action', color: '#5c5a52', bg: '#eeece5' }
+    };
+
+    const contracts = RAW.map((c) => {
+      const st = STATUS_STYLE[c.status];
+      const selected = c.id === selectedId;
+      return Object.assign({}, c, {
+        statusLabel: st.label,
+        statusColor: st.color,
+        statusBg: st.bg,
+        rowBorderColor: selected ? accent : '#e6e2d6',
+        rowBg: selected ? '#eef1f4' : '#ffffff',
+        select: () => this.setState({ selectedId: c.id })
+      });
+    });
+
+    const base = contracts.find((c) => c.id === selectedId) || contracts[0];
+    const pctChange = base.hasPrice && base.prevPrice
+      ? Math.round(((base.currPrice - base.prevPrice) / base.prevPrice) * 1000) / 10
+      : null;
+    const isSent = !!approved[base.id];
+
+    const selected = Object.assign({}, base, {
+      isFlagged: base.status === 'flagged',
+      isReviewedOnly: base.status === 'reviewed',
+      hasRisks: base.risks.length > 0,
+      hasNoRisks: base.risks.length === 0,
+      hasIncrease: !!pctChange && pctChange > 0,
+      pctChange: pctChange,
+      priceColor: pctChange && pctChange > 0 ? '#9a5a12' : '#1a1a17',
+      isSent: isSent,
+      isNotSent: !isSent,
+      approveEmail: () => this.setState({ approved: Object.assign({}, approved, { [base.id]: true }) })
+    });
+
+    const flaggedCount = RAW.filter((c) => c.status === 'flagged').length;
+    const reviewedCount = RAW.length - flaggedCount;
+    const priced = RAW.filter((c) => c.hasPrice);
+    const totalMonthly = priced.reduce((sum, c) => sum + c.currPrice, 0);
+
+    const AUDIT_RAW = [
+      { time: '6:54:12 PM', name: 'CloudHost Inc.', outcome: 'flagged', text: RAW[0].reasoning },
+      { time: '6:54:09 PM', name: 'Meridian Properties LLC', outcome: 'flagged', text: RAW[1].reasoning },
+      { time: '6:54:05 PM', name: 'SignalCRM', outcome: 'reviewed', text: RAW[2].reasoning },
+      { time: '6:54:03 PM', name: 'Northwind Payroll', outcome: 'reviewed', text: RAW[3].reasoning },
+      { time: '6:54:01 PM', name: 'Anthea Design Studio', outcome: 'reviewed', text: RAW[4].reasoning }
+    ];
+    const auditLog = AUDIT_RAW.map((a) => ({
+      time: a.time,
+      name: a.name,
+      text: a.text,
+      outcomeLabel: a.outcome === 'flagged' ? 'Flagged' : 'No action needed',
+      outcomeColor: a.outcome === 'flagged' ? '#9a5a12' : '#5c5a52',
+      outcomeBg: a.outcome === 'flagged' ? '#fbe9d9' : '#eeece5'
+    }));
+
+    return {
+      accent: accent,
+      isPortfolio: tab === 'portfolio',
+      isAudit: tab === 'audit',
+      selectPortfolioTab: () => this.setState({ tab: 'portfolio' }),
+      selectAuditTab: () => this.setState({ tab: 'audit' }),
+      portfolioTabColor: tab === 'portfolio' ? accent : '#8a887c',
+      portfolioTabBorder: tab === 'portfolio' ? accent : 'transparent',
+      auditTabColor: tab === 'audit' ? accent : '#8a887c',
+      auditTabBorder: tab === 'audit' ? accent : 'transparent',
+      contracts: contracts,
+      selected: selected,
+      totalCount: RAW.length,
+      flaggedCount: flaggedCount,
+      reviewedCount: reviewedCount,
+      totalMonthly: totalMonthly.toLocaleString(),
+      pricedCount: priced.length,
+      auditLog: auditLog
+    };
+  }
+}
+</script>
+</body>
+</html>

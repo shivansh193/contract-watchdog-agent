@@ -25,19 +25,27 @@ Pulled directly from the [hackathon's submission requirements](https://agentsfor
 - [ ] (Optional bonus) Build-story post on builder.aws.com mentioning
       "Agents for Humans" in the title
 
-## Demo script (suggested, fits in ~3 min)
+## Demo script (suggested, fits in ~4 min)
 
 1. One line on the problem: contracts silently auto-renew with price hikes
    and nobody re-reads the fine print in time.
 2. Run `python -m contract_watchdog.main` live, on camera.
 3. While it runs, narrate: it's loading contracts across types (SaaS,
-   lease, NDA), checking which ones have a notice deadline coming up,
-   analyzing each for price changes and risky language.
-4. Show the terminal summary output.
-5. Open `outbox/pending_decisions.jsonl` — show it only flagged the
-   contracts that actually needed a human, not all five.
-6. Show one of the drafted emails (via the agent's tool calls in the
-   transcript, or re-run with verbose logging) to prove it did real work,
-   not just a summary.
+   lease, employment, NDA), checking which ones have a notice deadline
+   coming up, analyzing each for price changes and risky language.
+4. Show the terminal summary output — flag that it correctly *skipped* the
+   borderline contract (risky language present, but flat price and a
+   distant deadline) — that's judgment, not keyword matching.
+5. Switch to the [portfolio dashboard](README.md#portfolio-dashboard):
+   click through the flagged contracts, show the matched risk clauses and
+   drafted email, click Approve & Send, then flip to the Audit Trail tab
+   to show every decision with its reasoning — this is the same data
+   shape `scripts/build_portfolio_snapshot.py` produces from the real run.
+6. **Run it a second time, live.** Show it does NOT re-notify on the
+   contracts it already flagged — `check_recent_decisions` /
+   `record_decision` remembering across runs is what makes "autonomous"
+   real instead of "re-sends the same alert every time you run it."
 7. Close on the architecture diagram for 10 seconds — one sentence on why
    only `notify_human` interrupts a person.
+
+Cut #5-6 if you're tight on time — #1-4 alone is a complete, honest demo.
