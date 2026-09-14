@@ -7,7 +7,7 @@
 <body>
 <x-dc>
 <helmet>
-  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Spectral:ital,wght@0,400;0,500;0,600;0,700;1,400;1,500&family=IBM+Plex+Sans:wght@400;500;600&display=swap">
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Spectral:ital,wght@0,300;0,400;0,500;0,600;0,700;1,400;1,500&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap">
   <style>
     * { box-sizing: border-box; }
     body { margin: 0; }
@@ -15,17 +15,24 @@
     .cw-tab { cursor: pointer; }
     .cw-action { cursor: pointer; }
     .cw-action:hover { opacity: 0.72; }
+    @keyframes cwRise { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: none; } }
+    .cw-rise { animation: cwRise 0.6s cubic-bezier(0.2, 0.8, 0.2, 1) both; }
+    .cw-rise-1 { animation-delay: 0.05s; }
+    .cw-rise-2 { animation-delay: 0.15s; }
   </style>
 </helmet>
 
 <div style="min-height: 100%; width: 100%; background: #f7f5f0; font-family: 'IBM Plex Sans', system-ui, sans-serif; color: #262420;">
   <div style="max-width: 780px; margin: 0 auto; padding: 64px 32px 120px;">
 
-    <div style="font-family:'IBM Plex Sans', sans-serif; font-size:11px; font-weight:600; text-transform:uppercase; letter-spacing:0.16em; color:#8a887c; margin-bottom:18px;">Contract Watchdog</div>
+    <div class="cw-rise" style="display:flex; justify-content:space-between; align-items:baseline; gap:16px; flex-wrap:wrap; margin-bottom:18px;">
+      <div style="font-size:11px; font-weight:600; text-transform:uppercase; letter-spacing:0.16em; color:#8a887c;">Contract Watchdog</div>
+      <div style="font-family:'IBM Plex Mono', monospace; font-size:11px; color:#a3a196; letter-spacing:0.02em;">Review No. 014 &middot; Sep 14, 2026</div>
+    </div>
 
-    <div style="font-family:'Spectral', Georgia, serif; font-weight:600; font-size:40px; line-height:1.15; letter-spacing:-0.015em; color:#1a1815; max-width:600px;">{{headline}}</div>
+    <div class="cw-rise cw-rise-1" style="font-family:'Spectral', Georgia, serif; font-weight:600; font-size:44px; line-height:1.14; letter-spacing:-0.018em; color:#1a1815; max-width:600px;"><span style="color:{{accent}};">{{headlineLead}}</span>{{headlineRest}}</div>
 
-    <div style="font-size:12px; color:#8a887c; margin-top:20px; text-transform:uppercase; letter-spacing:0.04em;">{{totalCount}} contracts monitored &nbsp;&middot;&nbsp; ${{totalMonthly}}/mo tracked across {{pricedCount}} priced agreements &nbsp;&middot;&nbsp; reviewed Sep 14, 2026, 6:54&nbsp;PM</div>
+    <div class="cw-rise cw-rise-2" style="font-family:'IBM Plex Mono', monospace; font-size:12px; color:#8a887c; margin-top:22px; letter-spacing:0.01em;">{{totalCount}} contracts monitored &nbsp;&middot;&nbsp; ${{totalMonthly}}/mo across {{pricedCount}} priced agreements &nbsp;&middot;&nbsp; last run 6:54&nbsp;PM</div>
 
     <div style="display:flex; gap:28px; margin-top:40px; padding-bottom:10px; border-bottom:1px solid #e2ddd0;">
       <div class="cw-tab" onClick="{{selectPortfolioTab}}" style="font-size:13px; font-weight:600; color:{{portfolioTabColor}}; padding-bottom:10px; margin-bottom:-11px; border-bottom:2px solid {{portfolioTabBorder}};">Portfolio</div>
@@ -40,7 +47,11 @@
         <div style="font-size:11px; font-weight:600; text-transform:uppercase; letter-spacing:0.12em; color:#9a5a12;">This week</div>
 
         <sc-for list="{{flagged}}" as="c" hint-placeholder-count="2">
-          <div style="margin-top:32px; padding-top:32px; border-top:1px solid #e2ddd0;">
+          <div style="display:flex; gap:20px; margin-top:36px; padding-top:36px; border-top:1px solid #e2ddd0;">
+
+            <div style="font-family:'Spectral', Georgia, serif; font-weight:300; font-size:36px; line-height:1; color:{{accent}}; opacity:0.55; width:44px; flex-shrink:0;">{{c.docketNumber}}</div>
+
+            <div style="flex:1; min-width:0;">
 
             <div style="display:flex; justify-content:space-between; align-items:baseline; gap:16px; flex-wrap:wrap;">
               <div style="font-family:'Spectral', Georgia, serif; font-size:23px; font-weight:600; color:#1a1815;">{{c.counterparty}}</div>
@@ -48,9 +59,9 @@
             </div>
             <div style="font-size:13px; color:#8a887c; margin-top:3px;">{{c.type}} &middot; {{c.description}}</div>
 
-            <div style="font-family:'Spectral', Georgia, serif; font-style:italic; font-size:17px; line-height:1.55; color:#3a3833; border-left:2px solid {{accent}}; padding-left:18px; margin-top:20px; max-width:580px;">{{c.reasoning}}</div>
+            <div style="font-family:'Spectral', Georgia, serif; font-style:italic; font-size:17px; line-height:1.55; color:#3a3833; border-left:2px solid {{accent}}; padding-left:18px; margin-top:20px; max-width:560px;">{{c.reasoning}}</div>
 
-            <div style="font-size:11px; text-transform:uppercase; letter-spacing:0.05em; color:#a3a196; margin-top:20px;">Renewal {{c.renewalDate}} &nbsp;&middot;&nbsp; Notice deadline {{c.noticeDeadline}} ({{c.daysUntil}}d) <sc-if value="{{c.hasIncrease}}" hint-placeholder-val="{{true}}">&nbsp;&middot;&nbsp; ${{c.prevPrice}} &rarr; ${{c.currPrice}}/mo ({{c.pctChange}}%)</sc-if></div>
+            <div style="font-family:'IBM Plex Mono', monospace; font-size:11px; letter-spacing:0.01em; color:#a3a196; margin-top:20px;">renewal {{c.renewalDate}} &nbsp;&middot;&nbsp; notice {{c.noticeDeadline}} ({{c.daysUntil}}d) <sc-if value="{{c.hasIncrease}}" hint-placeholder-val="{{true}}">&nbsp;&middot;&nbsp; ${{c.prevPrice}}&rarr;${{c.currPrice}}/mo ({{c.pctChange}}%)</sc-if></div>
 
             <sc-if value="{{c.hasRisks}}" hint-placeholder-val="{{true}}">
               <div style="margin-top:22px;">
@@ -79,6 +90,7 @@
               </div>
             </sc-if>
 
+            </div>
           </div>
         </sc-for>
       </div>
@@ -88,9 +100,9 @@
         <div style="font-size:11px; font-weight:600; text-transform:uppercase; letter-spacing:0.12em; color:#8a887c;">Reviewed &mdash; no action needed</div>
         <div style="margin-top:16px;">
           <sc-for list="{{reviewed}}" as="c" hint-placeholder-count="3">
-            <div style="padding:14px 0; border-top:1px solid #ece7da; font-size:13px;">
-              <span style="font-weight:600; color:#4a4940;">{{c.counterparty}}</span>
-              <span style="color:#a3a196;"> &mdash; {{c.reasoning}}</span>
+            <div style="display:flex; gap:20px; padding:13px 0; border-top:1px solid #ece7da; font-size:13px;">
+              <div style="font-weight:600; color:#4a4940; width:160px; flex-shrink:0;">{{c.counterparty}}</div>
+              <div style="color:#a3a196;">{{c.reasoning}}</div>
             </div>
           </sc-for>
         </div>
@@ -103,7 +115,7 @@
       <div style="margin-top:44px;">
         <sc-for list="{{auditLog}}" as="a" hint-placeholder-count="5">
           <div style="padding:16px 0; border-top:1px solid #ece7da; display:flex; gap:24px;">
-            <div style="font-size:11px; color:#a3a196; width:76px; flex-shrink:0; padding-top:2px;">{{a.time}}</div>
+            <div style="font-family:'IBM Plex Mono', monospace; font-size:11px; color:#a3a196; width:84px; flex-shrink:0; padding-top:2px;">{{a.time}}</div>
             <div>
               <div style="font-size:13px;">
                 <span style="font-weight:600; color:#1a1815;">{{a.name}}</span>
@@ -209,12 +221,13 @@ class Component extends DCLogic {
       }
     ];
 
-    const flagged = RAW.filter((c) => c.status === 'flagged').map((c) => {
+    const flagged = RAW.filter((c) => c.status === 'flagged').map((c, i) => {
       const pctChange = c.hasPrice && c.prevPrice
         ? Math.round(((c.currPrice - c.prevPrice) / c.prevPrice) * 1000) / 10
         : null;
       const isSent = !!approved[c.id];
       return Object.assign({}, c, {
+        docketNumber: String(i + 1).padStart(2, '0'),
         hasRisks: c.risks.length > 0,
         pctChange: pctChange,
         hasIncrease: !!pctChange && pctChange > 0,
@@ -231,11 +244,17 @@ class Component extends DCLogic {
     const priced = RAW.filter((c) => c.hasPrice);
     const totalMonthly = priced.reduce((sum, c) => sum + c.currPrice, 0);
 
-    const headline = flaggedCount === 0
-      ? 'Nothing needs you this week.'
-      : flaggedCount === 1
-        ? 'One contract needs your attention this week.'
-        : flaggedCount + ' contracts need your attention this week.';
+    let headlineLead, headlineRest;
+    if (flaggedCount === 0) {
+      headlineLead = 'Nothing';
+      headlineRest = ' needs you this week.';
+    } else if (flaggedCount === 1) {
+      headlineLead = 'One';
+      headlineRest = ' contract needs your attention this week.';
+    } else {
+      headlineLead = String(flaggedCount);
+      headlineRest = ' contracts need your attention this week.';
+    }
 
     const AUDIT_RAW = [
       { time: '6:54:12 PM', name: 'CloudHost Inc.', outcome: 'flagged', text: RAW[0].reasoning },
@@ -251,7 +270,8 @@ class Component extends DCLogic {
 
     return {
       accent: accent,
-      headline: headline,
+      headlineLead: headlineLead,
+      headlineRest: headlineRest,
       isPortfolio: tab === 'portfolio',
       isAudit: tab === 'audit',
       selectPortfolioTab: () => this.setState({ tab: 'portfolio' }),
