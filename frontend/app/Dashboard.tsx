@@ -2,6 +2,7 @@
 
 import { useMemo, useState } from "react";
 import type { AuditEntry, ContractRecord, PortfolioSnapshot } from "./types";
+import TryItYourself from "./TryItYourself";
 
 const ACCENT = "#7a2e22";
 
@@ -37,7 +38,7 @@ export default function Dashboard({
   snapshot: PortfolioSnapshot;
   auditLog: AuditEntry[];
 }) {
-  const [tab, setTab] = useState<"portfolio" | "audit">("portfolio");
+  const [tab, setTab] = useState<"portfolio" | "audit" | "try">("portfolio");
   const [approved, setApproved] = useState<Record<string, boolean>>({});
 
   const { flagged, reviewed, flaggedCount, reviewedCount, totalMonthly, pricedCount } =
@@ -113,9 +114,21 @@ export default function Dashboard({
         >
           Audit Trail
         </button>
+        <button
+          onClick={() => setTab("try")}
+          className="cursor-pointer text-[13px] font-semibold px-3 pt-2 pb-2.5 -mb-[11px] border-b-2 transition-colors"
+          style={{
+            color: tab === "try" ? "#1a1815" : "#a3a196",
+            borderColor: tab === "try" ? "#1a1815" : "transparent",
+          }}
+        >
+          Try It Yourself
+        </button>
       </div>
 
-      {tab === "portfolio" ? (
+      {tab === "try" && <TryItYourself />}
+
+      {tab === "portfolio" && (
         <div>
           {flaggedCount > 0 && (
             <div className="mt-12">
@@ -148,7 +161,9 @@ export default function Dashboard({
             </div>
           </div>
         </div>
-      ) : (
+      )}
+
+      {tab === "audit" && (
         <div className="bg-white border border-[#e6e2d6] rounded-sm">
           {auditLog.map((entry, i) => {
             const contract = snapshot.contracts.find((c) => c.id === entry.contractId);
