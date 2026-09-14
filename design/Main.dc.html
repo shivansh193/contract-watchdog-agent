@@ -7,7 +7,7 @@
 <body>
 <x-dc>
 <helmet>
-  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Spectral:ital,wght@0,300;0,400;0,500;0,600;0,700;1,400;1,500&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap">
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Spectral:ital,wght@0,300;0,400;0,600;1,400&family=IBM+Plex+Sans:wght@400;600&family=IBM+Plex+Mono:wght@400&display=swap">
   <style>
     * { box-sizing: border-box; }
     body { margin: 0; }
@@ -15,28 +15,24 @@
     .cw-tab { cursor: pointer; }
     .cw-action { cursor: pointer; }
     .cw-action:hover { opacity: 0.72; }
-    @keyframes cwRise { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: none; } }
-    .cw-rise { animation: cwRise 0.6s cubic-bezier(0.2, 0.8, 0.2, 1) both; }
-    .cw-rise-1 { animation-delay: 0.05s; }
-    .cw-rise-2 { animation-delay: 0.15s; }
   </style>
 </helmet>
 
 <div style="min-height: 100%; width: 100%; background: #f7f5f0; font-family: 'IBM Plex Sans', system-ui, sans-serif; color: #262420;">
   <div style="max-width: 780px; margin: 0 auto; padding: 64px 32px 120px;">
 
-    <div class="cw-rise" style="display:flex; justify-content:space-between; align-items:baseline; gap:16px; flex-wrap:wrap; margin-bottom:18px;">
+    <div style="display:flex; justify-content:space-between; align-items:baseline; gap:16px; flex-wrap:wrap; margin-bottom:18px;">
       <div style="font-size:11px; font-weight:600; text-transform:uppercase; letter-spacing:0.16em; color:#8a887c;">Contract Watchdog</div>
       <div style="font-family:'IBM Plex Mono', monospace; font-size:11px; color:#a3a196; letter-spacing:0.02em;">Review No. 014 &middot; Sep 14, 2026</div>
     </div>
 
-    <div class="cw-rise cw-rise-1" style="font-family:'Spectral', Georgia, serif; font-weight:600; font-size:44px; line-height:1.14; letter-spacing:-0.018em; color:#1a1815; max-width:600px;"><span style="color:{{accent}};">{{headlineLead}}</span>{{headlineRest}}</div>
+    <div style="font-family:'Spectral', Georgia, serif; font-weight:600; font-size:44px; line-height:1.14; letter-spacing:-0.018em; color:#1a1815; max-width:600px;"><span style="color:{{accent}};">{{headlineLead}}</span>{{headlineRest}}</div>
 
-    <div class="cw-rise cw-rise-2" style="font-family:'IBM Plex Mono', monospace; font-size:12px; color:#8a887c; margin-top:22px; letter-spacing:0.01em;">{{totalCount}} contracts monitored &nbsp;&middot;&nbsp; ${{totalMonthly}}/mo across {{pricedCount}} priced agreements &nbsp;&middot;&nbsp; last run 6:54&nbsp;PM</div>
+    <div style="font-family:'IBM Plex Mono', monospace; font-size:12px; color:#8a887c; margin-top:22px; letter-spacing:0.01em;">{{totalCount}} contracts monitored &nbsp;&middot;&nbsp; ${{totalMonthly}}/mo across {{pricedCount}} priced agreements &nbsp;&middot;&nbsp; last run 6:54&nbsp;PM</div>
 
-    <div style="display:flex; gap:28px; margin-top:40px; padding-bottom:10px; border-bottom:1px solid #e2ddd0;">
-      <div class="cw-tab" onClick="{{selectPortfolioTab}}" style="font-size:13px; font-weight:600; color:{{portfolioTabColor}}; padding-bottom:10px; margin-bottom:-11px; border-bottom:2px solid {{portfolioTabBorder}};">Portfolio</div>
-      <div class="cw-tab" onClick="{{selectAuditTab}}" style="font-size:13px; font-weight:600; color:{{auditTabColor}}; padding-bottom:10px; margin-bottom:-11px; border-bottom:2px solid {{auditTabBorder}};">Audit Trail</div>
+    <div style="display:flex; gap:4px; margin-top:40px; padding-bottom:10px; border-bottom:1px solid #e2ddd0;">
+      <div class="cw-tab" onClick="{{selectPortfolioTab}}" style="font-size:13px; font-weight:600; color:{{portfolioTabColor}}; padding:8px 12px 10px 12px; margin:-8px 0 -11px 0; border-bottom:2px solid {{portfolioTabBorder}};">Portfolio</div>
+      <div class="cw-tab" onClick="{{selectAuditTab}}" style="font-size:13px; font-weight:600; color:{{auditTabColor}}; padding:8px 12px 10px 12px; margin:-8px 0 -11px 0; border-bottom:2px solid {{auditTabBorder}};">Audit Trail</div>
     </div>
 
     <sc-if value="{{isPortfolio}}" hint-placeholder-val="{{true}}">
@@ -84,7 +80,7 @@
                     <div style="font-size:13px; font-weight:600; color:#4a6b4a;">&#10003;&nbsp; Approved, queued to send</div>
                   </sc-if>
                   <sc-if value="{{c.isNotSent}}" hint-placeholder-val="{{true}}">
-                    <div class="cw-action" onClick="{{c.approveEmail}}" style="display:inline-block; font-size:13px; font-weight:600; color:{{accent}};">Approve &amp; send &nbsp;&rarr;</div>
+                    <div class="cw-action" onClick="{{c.approveEmail}}" style="display:inline-block; font-size:13px; font-weight:600; color:{{accent}}; padding:8px 12px; margin:-8px -12px;">Approve &amp; send &nbsp;&rarr;</div>
                   </sc-if>
                 </div>
               </div>
